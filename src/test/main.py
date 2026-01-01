@@ -42,7 +42,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         # Setup dello stato
         self.state.project_key = project_key
         self.state.iteration = 1
-        
+
         # Resettiamo i valori legati al file, non più usati in questa fase
         self.state.file_path = ""
         self.state.file_content = ""
@@ -87,7 +87,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         try:
             print(f"Avvio scansione su: {project_dir}")
             print("Comando: mvn clean verify sonar...")
-            
+
             subprocess.run(
                 cmd_str,
                 cwd=project_dir,
@@ -114,33 +114,37 @@ class RefactoringFlow(Flow[RefactoringState]):
             response = requests.get(api_url, auth=(sonar_token, ""), params=params)
 
             if response.status_code != 200:
-                error_message = f"❌ Errore API Sonar: {response.status_code} - {response.text}"
+                error_message = (
+                    f"❌ Errore API Sonar: {response.status_code} - {response.text}"
+                )
                 print(error_message)
                 self.state.error_log = error_message
                 return False
 
             data = response.json()
-            
-            # La risposta con facets ha una struttura diversa
-            file_facet = next((f for f in data.get('facets', []) if f['property'] == 'files'), None)
 
-            if not file_facet or not file_facet.get('values'):
+            # La risposta con facets ha una struttura diversa
+            file_facet = next(
+                (f for f in data.get("facets", []) if f["property"] == "files"), None
+            )
+
+            if not file_facet or not file_facet.get("values"):
                 msg = "✅ Nessun file con issue trovato tramite facets."
                 print(msg)
                 self.state.error_log = msg
                 return True
-            
+
             # L'API di SonarQube di solito restituisce i valori ordinati per 'count' decrescente.
             # Prendiamo i primi 10.
-            top_10_files = file_facet['values'][:10]
+            top_10_files = file_facet["values"][:10]
 
             report = "Top 10 file con più errori energetici (via Facets):\n\n"
             for i, item in enumerate(top_10_files):
                 # 'val' contiene il component key del file
-                file_path = item['val'].split(':', 1)[-1]
-                count = item['count']
+                file_path = item["val"].split(":", 1)[-1]
+                count = item["count"]
                 report += f"{i+1}. {file_path}  ({count} issues)\n"
-            
+
             print("\n--- RISULTATI ANALISI HOTSPOTS ---")
             print(report)
             self.state.error_log = report
@@ -156,8 +160,8 @@ class RefactoringFlow(Flow[RefactoringState]):
 
         return True
 
-'''    @listen(
-        run_initial_analysis
+    @listen(
+        run_analysis_and_find_hotspots
     )  # <--- MODIFICA CHIAVE: Concatena al metodo precedente
     def run_refactoring_crew(self):
         """
@@ -181,7 +185,7 @@ class RefactoringFlow(Flow[RefactoringState]):
     def finish(self):
         print("\n--- STEP 4: Fine Flusso ---")
         print(f"File processato: {self.state.file_path}")
-'''
+
 
 def kickoff():
     refactoring_flow = RefactoringFlow()
