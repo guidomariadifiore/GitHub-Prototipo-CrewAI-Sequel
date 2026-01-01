@@ -51,6 +51,7 @@ class SonarScanTool(BaseTool):
 
     def _run(self, project_key: str, file_path: str) -> str:
         # 1. Configurazione Parametri (da variabili d'ambiente o hardcoded per test)
+        sonar_token = os.getenv("SONAR_TOKEN")
         sonar_url = os.getenv("SONAR_HOST_URL", "http://localhost:9000")
         project_dir = os.getcwd() # O la root del tuo progetto target
         
