@@ -8,7 +8,6 @@ from crewai import Agent, Crew, Process, Task, LLM, TaskOutput
 from crewai.project import CrewBase, agent, crew, task
 from crewai.tools import tool, BaseTool
 from file_tools import FileUpdateTool
-from tools.tools import SonarScanTool
 
 # Assicurati che questi import puntino ai tuoi file corretti o definisci le costanti qui
 # Se non hai il file constants.py, modifica DIRECTORY_REPOS con il path assoluto della cartella dei progetti
@@ -71,15 +70,15 @@ class RefactorCrew:
 
     @agent
     def code_replacer(self) -> Agent:
-        return Agent(config=self.agents_config['code_replacer'], verbose=False, llm=self.llm)
+        return Agent(config=self.agents_config['code_replacer'], verbose=True, llm=self.llm)
 
     @agent
     def sonar_agent(self) -> Agent:
-        return Agent(config=self.agents_config['sonar_agent'], verbose=False, llm=self.llm)
+        return Agent(config=self.agents_config['sonar_agent'], verbose=True, llm=self.llm)
 
     @agent
     def errors_summarizer(self) -> Agent:
-        return Agent(config=self.agents_config['errors_summarizer'], verbose=False, llm=self.llm)
+        return Agent(config=self.agents_config['errors_summarizer'], verbose=True, llm=self.llm)
 
     @task
     def task1(self) -> Task:
@@ -122,5 +121,5 @@ class RefactorCrew:
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            verbose=True
+            verbose=False
         )

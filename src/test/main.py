@@ -73,7 +73,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
         
         # Comando per la scansione iniziale
-        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -Dmaven.compiler.failOnError=false"
+        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
 
         try:
             print(f"Avvio scansione su: {project_dir}")
