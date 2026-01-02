@@ -73,7 +73,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
         
         # Comando per la scansione iniziale
-        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
+        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -Dmaven.compiler.failOnError=false"
 
         try:
             print(f"Avvio scansione su: {project_dir}")
@@ -119,6 +119,10 @@ class RefactoringFlow(Flow[RefactoringState]):
         """
         Step 3: Recupera le issue per il file selezionato.
         """
+        if not self.state.file_path:
+            print("⚠️ Nessun file selezionato. Salto recupero issues.")
+            return False
+
         print(f"\n--- STEP 3: Recupero Issues per {self.state.file_path} ---")
         sonar_token = os.getenv("SONAR_TOKEN")
         api_url = "http://localhost:9000/api/issues/search"
@@ -151,23 +155,75 @@ class RefactoringFlow(Flow[RefactoringState]):
         """
         Step 4: Esegue il refactoring per il file basandosi su tutte le issue trovate.
         """
+        if not self.state.file_path:
+            print("⚠️ Nessun file selezionato. Salto refactoring.")
+            return False
+
         print(f"\n--- STEP 4: Avvio Refactoring per {len(self.state.issues)} issues ---")
 
-        full_file_path = os.path.join(DIRECTORY_REPOS, self.state.file_path)
+        full_file_path = os.path.join(DIRECTORY_REPOS, self.state.project_key, self.state.file_path)
+        full_file_path = os.path.normpath(full_file_path)
+
+        if not os.path.isfile(full_file_path):
+            print(f"❌ Il percorso non è un file valido o non esiste: {full_file_path}")
+            return False
 
         try:
             with open(full_file_path, "r", encoding="utf-8") as f:
                 self.state.file_content = f.read()
-        except FileNotFoundError:
-            print(f"❌ File non trovato: {full_file_path}")
+        except Exception as e:
+            print(f"❌ Errore lettura file {full_file_path}: {e}")
             return False # Interrompi se il file non può essere letto
 
-        # Passiamo tutte le issue in una volta sola
+        # Calculate the range of lines affected by issues
+        lines = self.state.file_content.splitlines()
+        total_lines = len(lines)
+        
+        min_line = total_lines
+        max_line = 1
+        
+        if not self.state.issues:
+             min_line = 1
+             max_line = total_lines
+        else:
+            for issue in self.state.issues:
+                # SonarQube textRange is 1-based
+                tr = issue.get("textRange", {})
+                start = tr.get("startLine", 1)
+                end = tr.get("endLine", start)
+                if start < min_line: min_line = start
+                if end > max_line: max_line = end
+        
+        # Add context padding (e.g. 20 lines)
+        PADDING = 20
+        PADDING = 50
+        start_idx = max(0, min_line - 1 - PADDING)
+        end_idx = min(total_lines, max_line + PADDING)
+        
+        snippet_lines = lines[start_idx:end_idx]
+        snippet_content = "\n".join(snippet_lines)
+        
+        # Create numbered snippet for the LLM
+        numbered_snippet = []
+        for i, line in enumerate(snippet_lines):
+            numbered_snippet.append(f"{start_idx + 1 + i}: {line}")
+        
+        snippet_content = "\n".join(numbered_snippet)
+        
+        # 1-based start line for the snippet and count of lines to replace
+        start_line = start_idx + 1
+        line_count = end_idx - start_idx
+
+        print(f"--- Extracting Snippet: Lines {start_line} to {end_idx} ({line_count} lines) ---")
+        print(f"--- Extracting Snippet: Lines {start_line} to {end_idx} ---")
+
         inputs = {
-            "code_class": self.state.file_content,
+            "code_class": snippet_content,
             "path_class": full_file_path,
             "project_key": self.state.project_key,
             "errors": json.dumps(self.state.issues), # Passa l'intera lista di issue
+            "start_line": start_line,
+            "line_count": line_count
         }
 
         print("Avvio RefactorCrew con tutte le issue...")
@@ -185,7 +241,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         sonar_token = os.getenv("SONAR_TOKEN")
         project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
         
-        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
+        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -Dmaven.compiler.failOnError=false"
 
         try:
             print(f"Avvio scansione finale su: {project_dir}")

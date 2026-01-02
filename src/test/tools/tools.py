@@ -4,34 +4,9 @@ import time
 import requests
 from typing import Type
 from pydantic import BaseModel, Field
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 
-# --- 1. TOOL DI SOSTITUZIONE FILE (Per Task 3 - code_replacer) ---
 
-class FileUpdateInput(BaseModel):
-    file_path: str = Field(..., description="Il percorso assoluto del file locale da sovrascrivere.")
-    new_code: str = Field(..., description="Il codice Java completo e rifattorizzato.")
-
-class FileUpdateTool(BaseTool):
-    name: str = "File Update Tool"
-    description: str = (
-        "Sovrascrive il contenuto di un file con il nuovo codice fornito. "
-        "Usa questo tool per salvare il refactoring fisico su disco."
-    )
-    args_schema: Type[BaseModel] = FileUpdateInput
-
-    def _run(self, file_path: str, new_code: str) -> str:
-        try:
-            if not os.path.exists(file_path):
-                return f"Errore: Il file {file_path} non esiste."
-
-            # Scrittura con codifica UTF-8
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(new_code)
-            
-            return f"Successo: File {os.path.basename(file_path)} aggiornato correttamante."
-        except Exception as e:
-            return f"Errore critico durante la scrittura del file: {str(e)}"
 
 
 # --- 2. TOOL DI SCANSONE SONAR (Per Task 4 - sonar_agent) ---
