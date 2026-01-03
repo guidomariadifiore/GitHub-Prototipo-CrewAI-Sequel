@@ -2,20 +2,31 @@ import os
 import subprocess
 import time
 import requests
-from typing import List, Optional
+from typing import List, Optional, Type
+from pydantic import BaseModel, Field
 
 from crewai import Agent, Crew, Process, Task, LLM, TaskOutput
 from crewai.project import CrewBase, agent, crew, task
 from crewai.tools import tool, BaseTool
 from file_tools import FileUpdateTool
+from tools.tools import SonarScanTool
 
 # Assicurati che questi import puntino ai tuoi file corretti o definisci le costanti qui
 # Se non hai il file constants.py, modifica DIRECTORY_REPOS con il path assoluto della cartella dei progetti
 from constants import DIRECTORY_REPOS
 
+class FilePatchToolSchema(BaseModel):
+    """Input for FilePatchTool."""
+    file_path: str = Field(..., description="The absolute path to the file that needs to be patched.")
+    new_code: str = Field(..., description="The new code that will replace the specified lines.")
+    start_line: int = Field(..., description="The line number where the replacement should start (inclusive).")
+    end_line: int = Field(..., description="The line number where the replacement should end (inclusive).")
+
+
 class FilePatchTool(BaseTool):
     name: str = "File Patch Tool"
     description: str = "Replaces a specific range of lines in a file with new code. Requires file_path, new_code, start_line, and end_line (inclusive)."
+    args_schema: Type[BaseModel] = FilePatchToolSchema
     
     def _run(self, file_path: str, new_code: str, start_line: int, end_line: int) -> str:
         try:

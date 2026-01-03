@@ -28,8 +28,7 @@ task2: #refactoring
 task3: #code substitution
   description: >
     Patches the original local file at "{path_class}" with the refactored code from the previous task.
-    Look at the original numbered CODE SNIPPET provided in the inputs to identify the exact 'start_line' and 'end_line' (inclusive) that correspond to the code you refactored.
-    You MUST use the 'File Patch Tool' with the correct start_line and end_line to ensure you replace exactly the old method/block and nothing else.
+    You MUST use the 'File Patch Tool' with the correct start_line and end_line.
   expected_output: >
     Confirmation that the patch has been applied to the specified file.
   agent: code_refactor
