@@ -175,59 +175,24 @@ class RefactoringFlow(Flow[RefactoringState]):
             print(f"❌ Errore lettura file {full_file_path}: {e}")
             return False # Interrompi se il file non può essere letto
 
-        # Calculate the range of lines affected by issues
-        lines = self.state.file_content.splitlines()
-        total_lines = len(lines)
-        
-        min_line = total_lines
-        max_line = 1
-        
-        if not self.state.issues:
-             min_line = 1
-             max_line = total_lines
-        else:
-            for issue in self.state.issues:
-                # SonarQube textRange is 1-based
-                tr = issue.get("textRange", {})
-                start = tr.get("startLine", 1)
-                end = tr.get("endLine", start)
-                if start < min_line: min_line = start
-                if end > max_line: max_line = end
-        
-        # Add context padding (e.g. 20 lines)
-        PADDING = 20
-        PADDING = 50
-        start_idx = max(0, min_line - 1 - PADDING)
-        end_idx = min(total_lines, max_line + PADDING)
-        
-        snippet_lines = lines[start_idx:end_idx]
-        snippet_content = "\n".join(snippet_lines)
-        
-        # Create numbered snippet for the LLM
-        numbered_snippet = []
-        for i, line in enumerate(snippet_lines):
-            numbered_snippet.append(f"{start_idx + 1 + i}: {line}")
-        
-        snippet_content = "\n".join(numbered_snippet)
-        
-        # 1-based start line for the snippet and count of lines to replace
-        start_line = start_idx + 1
-        line_count = end_idx - start_idx
+        # Logica Full File: Passiamo l'intero contenuto del file
+        total_lines = len(self.state.file_content.splitlines())
+        print(f"--- Using Full File Content ({total_lines} lines) ---")
 
-        print(f"--- Extracting Snippet: Lines {start_line} to {end_idx} ({line_count} lines) ---")
-        print(f"--- Extracting Snippet: Lines {start_line} to {end_idx} ---")
+        project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
 
         inputs = {
-            "code_class": snippet_content,
+            "code_class": self.state.file_content,
             "path_class": full_file_path,
             "project_key": self.state.project_key,
+            "project_dir": project_dir,
             "errors": json.dumps(self.state.issues), # Passa l'intera lista di issue
-            "start_line": start_line,
-            "line_count": line_count
+            "start_line": 1,
+            "line_count": total_lines
         }
 
         print("Avvio RefactorCrew con tutte le issue...")
-        RefactorCrew(llm=self.llm).crew().kickoff(inputs=inputs)
+        RefactorCrew(llm=self.llm).run_refactoring_cycle(inputs=inputs)
         print("--- Refactoring completato ---")
         
         return True

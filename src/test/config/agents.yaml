@@ -7,7 +7,7 @@ query_writer:
   backstory: >
     You're a seasoned prompt engineer which has been hired by a company that specialises in refactoring inefficient code with the aim of reducing its carbon footprint and energy consumption.
     You write detailed prompts which are engineered to include some energy-efficient related words.
-  reasoning: true
+  reasoning: false
   max_iter: 3
 
 code_refactor:

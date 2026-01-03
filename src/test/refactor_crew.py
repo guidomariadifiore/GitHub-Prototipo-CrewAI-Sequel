@@ -101,13 +101,13 @@ class RefactorCrew:
 
     @task
     def task3(self) -> Task:
-        return Task(config=self.tasks_config['task3'], verbose=False, tools=[FilePatchTool()])
+        return Task(config=self.tasks_config['task3'], verbose=True, tools=[FileUpdateTool()])
 
     @task
     def task4(self) -> Task:
         return Task(
             config=self.tasks_config['task4'], 
-            verbose=False, 
+            verbose=True, 
             tools=[SonarScanTool()]
         )
 
@@ -115,22 +115,73 @@ class RefactorCrew:
     def conditional_task5(self) -> Task:
         return Task(
             config=self.tasks_config['conditional_task5'], 
-            verbose=False, 
-            tools=[FilePatchTool()]
+            verbose=True, 
+            tools=[FileUpdateTool()]
         )
 
     @task
     def conditional_task6(self) -> Task:
         return Task(
             config=self.tasks_config['conditional_task6'], 
-            verbose=False
+            verbose=True
         )
 
     @crew
     def crew(self) -> Crew:
+        """
+        Defines the basic crew. Note: For the conditional retry logic, 
+        use run_refactoring_cycle() instead of crew().kickoff().
+        """
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
             verbose=False
         )
+
+    def run_refactoring_cycle(self, inputs: dict):
+        """
+        Executes the refactoring flow with retry logic (max 3 attempts).
+        Flow: Refactor -> Scan -> (If Fail: Revert -> Summarize -> Retry)
+        """
+        max_retries = 3
+        for attempt in range(max_retries):
+            print(f"\n=== Refactoring Attempt {attempt + 1}/{max_retries} ===")
+            
+            # Phase 1: Refactor, Patch, and Scan
+            # We explicitly select tasks 1-4
+            refactor_crew = Crew(
+                agents=[self.query_writer(), self.code_refactor(), self.code_replacer(), self.sonar_agent()],
+                tasks=[self.task1(), self.task2(), self.task3(), self.task4()],
+                process=Process.sequential,
+                verbose=True
+            )
+            
+            result = refactor_crew.kickoff(inputs=inputs)
+            result_str = str(result).lower()
+            
+            # Check for build failure. 
+            # NOTE: Adjust this condition based on the actual output format of your SonarScanTool/Task4.
+            if "build failure" not in result_str and "error" not in result_str:
+                print(">>> Refactoring Successful!")
+                return result
+            
+            print(f">>> Build Failed. Initiating recovery (Attempt {attempt + 1})...")
+            
+            # Phase 2: Revert and Summarize
+            # We explicitly select tasks 5-6
+            recovery_crew = Crew(
+                agents=[self.code_replacer(), self.errors_summarizer()],
+                tasks=[self.conditional_task5(), self.conditional_task6()],
+                process=Process.sequential,
+                verbose=True
+            )
+            
+            summary = recovery_crew.kickoff(inputs=inputs)
+            
+            # Update inputs for the next iteration
+            inputs['previous_errors'] = summary
+            inputs['previous_code_context'] = "Code was reverted due to build failure. Please fix the errors."
+            
+        print(">>> Max retries reached. Giving up on this file.")
+        return "Refactoring failed after 3 attempts."
