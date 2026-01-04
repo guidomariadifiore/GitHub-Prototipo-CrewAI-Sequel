@@ -16,7 +16,7 @@ from crewai import LLM
 
 # Assicurati che questi import siano corretti rispetto alla tua struttura cartelle
 from refactor_crew import RefactorCrew
-from constants import DIRECTORY_REPOS
+from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES
 
 
 # Definiamo lo stato del flusso
@@ -186,7 +186,7 @@ class RefactoringFlow(Flow[RefactoringState]):
             "path_class": full_file_path,
             "project_key": self.state.project_key,
             "project_dir": project_dir,
-            "errors": json.dumps(self.state.issues), # Passa l'intera lista di issue
+            "errors": f"{json.dumps(self.state.issues)}\n\n{JAVA_COLLECTION_RULES}", # Passa issues + regole
             "start_line": 1,
             "line_count": total_lines
         }
