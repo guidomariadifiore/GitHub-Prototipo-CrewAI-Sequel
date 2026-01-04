@@ -1,3 +1,5 @@
+# TESTARE (avvia da 0 e vedi che succede)
+
 task1: #code analysis and prompting
   description: >
     Analyze the Java code provided below.
@@ -37,7 +39,7 @@ task3: #code substitution
 task4: #Scanning and validation
   description: >
     Run the sonar-scanner and Maven commands from the terminal on the newly modified file "{path_class}" in project "{project_key}".
-    IMPORTANT: The Maven project is located at "{project_dir}". You MUST execute the command in this directory.
+    IMPORTANT: You MUST use the 'Sonar Scan Tool' and pass the 'project_dir' argument ("{project_dir}") explicitly to it.
     Must verify the compilation and capture any errors.  
   expected_output: >
     The scan result (Build Success/Failure) according to Quality Gates, without showing the code

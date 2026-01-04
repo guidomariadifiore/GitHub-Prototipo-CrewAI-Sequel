@@ -9,7 +9,6 @@ from crewai import Agent, Crew, Process, Task, LLM, TaskOutput
 from crewai.project import CrewBase, agent, crew, task
 from crewai.tools import tool, BaseTool
 from file_tools import FileUpdateTool
-from tools.tools import SonarScanTool
 
 # Assicurati che questi import puntino ai tuoi file corretti o definisci le costanti qui
 # Se non hai il file constants.py, modifica DIRECTORY_REPOS con il path assoluto della cartella dei progetti
@@ -56,6 +55,33 @@ class FilePatchTool(BaseTool):
             return "File patched successfully."
         except Exception as e:
             return f"Error patching file: {str(e)}"
+
+class SonarScanToolSchema(BaseModel):
+    """Input for SonarScanTool."""
+    project_key: str = Field(..., description="The key of the project to scan.")
+    project_dir: str = Field(..., description="The absolute path to the project root directory containing the pom.xml.")
+
+class SonarScanTool(BaseTool):
+    name: str = "Sonar Scan Tool"
+    description: str = "Executes Maven build and SonarQube scan in the specified project directory. Returns the build output."
+    args_schema: Type[BaseModel] = SonarScanToolSchema
+
+    def _run(self, project_key: str, project_dir: str) -> str:
+        sonar_token = os.getenv("SONAR_TOKEN")
+        if not sonar_token:
+            return "Error: SONAR_TOKEN environment variable not set."
+
+        # Command exactly as used in main.py
+        cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -Dmaven.compiler.failOnError=false"
+        
+        try:
+            # cwd=project_dir ensures we run in the correct folder
+            result = subprocess.run(cmd, cwd=project_dir, shell=True, capture_output=True, text=True)
+            if result.returncode != 0:
+                return f"BUILD FAILURE:\n{result.stdout}\n{result.stderr}"
+            return f"BUILD SUCCESS:\n{result.stdout}"
+        except Exception as e:
+            return f"Execution Error: {str(e)}"
 
 # -------------------------------------------------------------------------
 # CREW DEFINITION
@@ -180,7 +206,7 @@ class RefactorCrew:
             summary = recovery_crew.kickoff(inputs=inputs)
             
             # Update inputs for the next iteration
-            inputs['previous_errors'] = summary
+            inputs['previous_errors'] = str(summary)
             inputs['previous_code_context'] = "Code was reverted due to build failure. Please fix the errors."
             
         print(">>> Max retries reached. Giving up on this file.")
