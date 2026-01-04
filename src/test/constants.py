@@ -60,3 +60,25 @@ DEPENDENCY & PACKAGE INFO:
 - **Apache Commons Collections**: `org.apache.commons.collections` (e.g., `org.apache.commons.collections4.list.TreeList`, `org.apache.commons.collections4.map.HashedMap`)
 - **JCF**: `java.util.*` (Java Collection Framework)
 """
+
+MAVEN_DEPENDENCIES = {
+    "eclipse_collections": """
+        <!-- Eclipse Collections -->
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections-api</artifactId>
+            <version>11.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections</artifactId>
+            <version>11.1.0</version>
+        </dependency>""",
+    "commons_collections": """
+        <!-- Apache Commons Collections -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>"""
+}

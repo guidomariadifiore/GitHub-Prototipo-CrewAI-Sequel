@@ -16,7 +16,7 @@ from crewai import LLM
 
 # Assicurati che questi import siano corretti rispetto alla tua struttura cartelle
 from refactor_crew import RefactorCrew
-from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES
+from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES, MAVEN_DEPENDENCIES
 
 
 # Definiamo lo stato del flusso
@@ -32,7 +32,7 @@ class RefactoringState(BaseModel):
 
 class RefactoringFlow(Flow[RefactoringState]):
     llm = LLM(
-        model="gemini-2.5-flash-lite", # MODIFICARE DOPO AVER TESTATO
+        model="gemini-2.0-flash", # Changed for better tool execution reliability
         api_key=os.getenv("GEMINI_API_KEY"),
         temperature=0.2
     )
@@ -151,6 +151,67 @@ class RefactoringFlow(Flow[RefactoringState]):
         return True
 
     @listen(get_issues_for_file)
+    def ensure_dependencies(self):
+        """
+        Step 3.5: Checks if 'Avoid Java Collection Framework' issues exist and adds dependencies to pom.xml.
+        """
+        # Check if we have relevant issues
+        has_collection_issue = False
+        for issue in self.state.issues:
+            msg = issue.get("message", "")
+            rule = issue.get("rule", "")
+            # Check specifically for the issue type mentioned
+            if "Avoid Java Collection Framework" in msg or "AvoidJavaCollectionFramework" in rule: 
+                has_collection_issue = True
+                break
+        
+        if not has_collection_issue:
+            print("ℹ️ No 'Avoid Java Collection Framework' issues found. Skipping dependency check.")
+            return True
+
+        print(f"\n--- STEP 3.5: Checking Maven Dependencies (pom.xml) ---")
+        pom_path = os.path.join(DIRECTORY_REPOS, self.state.project_key, "pom.xml")
+        
+        if not os.path.exists(pom_path):
+            print(f"❌ pom.xml not found at: {pom_path}")
+            return False
+
+        try:
+            with open(pom_path, "r", encoding="utf-8") as f:
+                pom_content = f.read()
+            
+            new_deps = []
+
+            # Check and add Eclipse Collections
+            if "org.eclipse.collections" not in pom_content:
+                print("➕ Adding dependency: Eclipse Collections")
+                new_deps.append(MAVEN_DEPENDENCIES["eclipse_collections"])
+            
+            # Check and add Apache Commons Collections
+            if "commons-collections4" not in pom_content:
+                print("➕ Adding dependency: Apache Commons Collections")
+                new_deps.append(MAVEN_DEPENDENCIES["commons_collections"])
+
+            if new_deps:
+                if "</dependencies>" in pom_content:
+                    insertion = "\n".join(new_deps)
+                    new_pom_content = pom_content.replace("</dependencies>", f"{insertion}\n    </dependencies>")
+                    
+                    with open(pom_path, "w", encoding="utf-8") as f:
+                        f.write(new_pom_content)
+                    print("✅ pom.xml updated successfully.")
+                else:
+                    print("⚠️ Could not find </dependencies> tag in pom.xml. Skipping update.")
+            else:
+                print("✅ Dependencies already present.")
+
+        except Exception as e:
+            print(f"❌ Error updating pom.xml: {e}")
+            return False
+            
+        return True
+
+    @listen(ensure_dependencies)
     def refactor_file_issues(self):
         """
         Step 4: Esegue il refactoring per il file basandosi su tutte le issue trovate.

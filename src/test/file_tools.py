@@ -4,15 +4,15 @@ import os
 
 # Definizione degli input per il tool
 class FileUpdateInput(BaseModel):
-    file_path: str = Field(..., description="Il percorso assoluto o relativo del file locale da sovrascrivere.")
-    new_code: str = Field(..., description="Il codice Java completo e rifattorizzato da scrivere nel file.")
+    file_path: str = Field(..., description="The absolute or relative path of the local file to overwrite.")
+    new_code: str = Field(..., description="The complete refactored Java code to write into the file.")
 
 class FileUpdateTool(BaseTool):
     name: str = "Overwrite File Tool"
     description: str = (
-        "Questo strumento serve per sovrascrivere il contenuto di un file esistente "
-        "con nuovo codice. DEVE essere usato per salvare il refactoring. "
-        "Richiede il percorso esatto del file e il contenuto completo."
+        "Use this tool to overwrite an existing file with new code. "
+        "This tool MUST be used to save the refactoring results. "
+        "Requires the absolute path of the file and the complete new content."
     )
     args_schema: type[BaseModel] = FileUpdateInput
 
