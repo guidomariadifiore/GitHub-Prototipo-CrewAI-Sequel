@@ -2,6 +2,7 @@ import os
 import subprocess
 import time
 import requests
+import json
 from typing import List, Optional, Type
 from pydantic import BaseModel, Field
 
@@ -77,8 +78,14 @@ class SonarScanTool(BaseTool):
         try:
             # cwd=project_dir ensures we run in the correct folder
             result = subprocess.run(cmd, cwd=project_dir, shell=True, capture_output=True, text=True)
+            
+            # Save full log to file for error summarizer
+            log_path = os.path.join(project_dir, "maven_build_log.txt")
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write(f"STDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}")
+
             if result.returncode != 0:
-                return f"BUILD FAILURE:\n{result.stdout}\n{result.stderr}"
+                return f"BUILD FAILURE. Check maven_build_log.txt for details.\n{result.stdout[-1000:]}"
             return f"BUILD SUCCESS:\n{result.stdout}"
         except Exception as e:
             return f"Execution Error: {str(e)}"
@@ -150,10 +157,12 @@ class RefactorCrew:
 
     @task
     def conditional_task6(self) -> Task:
-        return Task(
+        t = Task(
             config=self.tasks_config['conditional_task6'], 
             verbose=True
         )
+        t.description += "\n\nERROR CONTEXT / FAILURE DETAILS:\n{current_failure_reason}"
+        return t
 
     @crew
     def crew(self) -> Crew:
@@ -174,6 +183,11 @@ class RefactorCrew:
         Flow: Refactor -> Scan -> (If Fail: Revert -> Summarize -> Retry)
         """
         max_retries = 3
+        original_issues = inputs.get('original_issues_list', [])
+        project_key = inputs.get('project_key')
+        project_dir = inputs.get('project_dir')
+        file_path_full = inputs.get('path_class')
+
         for attempt in range(max_retries):
             print(f"\n=== Refactoring Attempt {attempt + 1}/{max_retries} ===")
             
@@ -187,18 +201,41 @@ class RefactorCrew:
             )
             
             result = refactor_crew.kickoff(inputs=inputs)
-            result_str = str(result).lower()
+            result_str = str(result)
+            result_lower = result_str.lower()
             
             # Check for build failure. 
-            # NOTE: Adjust this condition based on the actual output format of your SonarScanTool/Task4.
-            if "build failure" not in result_str and "execution error" not in result_str and "error:" not in result_str:
-                print(">>> Refactoring Successful!")
-                return result
+            build_failed = "build failure" in result_lower or "execution error" in result_lower or "error:" in result_lower
             
-            print(f">>> Build Failed. Initiating recovery (Attempt {attempt + 1})...")
+            failure_reason = ""
+            failure_details = ""
+
+            if build_failed:
+                failure_reason = "Build Failed"
+                # Retrieve full log from file
+                log_path = os.path.join(project_dir, "maven_build_log.txt")
+                if os.path.exists(log_path):
+                    with open(log_path, "r", encoding="utf-8") as f:
+                        failure_details = f.read()
+                else:
+                    failure_details = result_str
+            else:
+                # Build Success - Now Verify Issues
+                print(">>> Build Successful. Verifying SonarQube issues...")
+                verification_error = self._verify_refactoring(project_key, project_dir, file_path_full, original_issues)
+                
+                if not verification_error:
+                    print(">>> Refactoring Verified! Issues resolved.")
+                    return result
+                else:
+                    failure_reason = "Verification Failed"
+                    failure_details = verification_error
+            
+            print(f">>> {failure_reason}. Initiating recovery (Attempt {attempt + 1})...")
             
             # Phase 2: Revert and Summarize
             # We explicitly select tasks 5-6
+            inputs['current_failure_reason'] = f"{failure_reason}\n\nDETAILS:\n{failure_details}"
             recovery_crew = Crew(
                 agents=[self.code_replacer(), self.errors_summarizer()],
                 tasks=[self.conditional_task5(), self.conditional_task6()],
@@ -210,7 +247,79 @@ class RefactorCrew:
             
             # Update inputs for the next iteration
             inputs['previous_errors'] = str(summary)
-            inputs['previous_code_context'] = "Code was reverted due to build failure. Please fix the errors."
+            inputs['previous_code_context'] = f"Attempt {attempt+1} failed. Reason: {failure_reason}. Code was reverted. Please fix."
+            
+            print("\n🛑 PAUSED: Press 'U' and Enter to resume next attempt...")
+            while True:
+                if input().strip().upper() == 'U':
+                    break
             
         print(">>> Max retries reached. Giving up on this file.")
         return "Refactoring failed after 3 attempts."
+
+    def _verify_refactoring(self, project_key: str, project_dir: str, file_path_full: str, original_issues: list) -> Optional[str]:
+        """
+        Verifies if the refactoring resolved original issues and didn't introduce new ones.
+        Returns None if successful, or an error message string if verification failed.
+        """
+        sonar_token = os.getenv("SONAR_TOKEN")
+        sonar_url = os.getenv("SONAR_HOST_URL", "http://localhost:9000")
+        
+        if not sonar_token:
+            return "SONAR_TOKEN not set, cannot verify."
+
+        # Calculate relative path for SonarQube component key
+        try:
+            relative_path = os.path.relpath(file_path_full, project_dir).replace("\\", "/")
+        except ValueError:
+            return f"Could not determine relative path for {file_path_full} relative to {project_dir}"
+
+        component_key = f"{project_key}:{relative_path}"
+        
+        api_url = f"{sonar_url}/api/issues/search"
+        params = {
+            "componentKeys": component_key,
+            "resolved": "false",
+            "ps": 500
+        }
+        
+        try:
+            response = requests.get(api_url, auth=(sonar_token, ""), params=params)
+            response.raise_for_status()
+            data = response.json()
+            current_issues = data.get("issues", [])
+        except Exception as e:
+            return f"Error querying SonarQube API: {str(e)}"
+
+        # Check for NEW issues (Regressions) - Corresponds to "New Issues" tab in SonarQube
+        try:
+            params_new = params.copy()
+            params_new["inNewCodePeriod"] = "true"
+            params_new["ps"] = 50
+            resp_new = requests.get(api_url, auth=(sonar_token, ""), params=params_new)
+            resp_new.raise_for_status()
+            new_data = resp_new.json()
+            total_new = new_data.get("total", 0)
+            if total_new > 0:
+                issues = new_data.get("issues", [])
+                details = []
+                for issue in issues:
+                    details.append(f"- Line {issue.get('line', '?')}: [{issue.get('rule', 'Unknown')}] {issue.get('message', '')}")
+                return f"Refactoring introduced {total_new} NEW issues (regressions):\n" + "\n".join(details)
+        except Exception as e:
+            print(f"Warning: Could not check new code period issues: {e}")
+
+        original_rules = {issue.get("rule") for issue in original_issues}
+        current_rules = {issue.get("rule") for issue in current_issues}
+        
+        # Check for new issue types (regressions)
+        new_rules = current_rules - original_rules
+        if new_rules:
+            return f"New issue types introduced: {', '.join(new_rules)}"
+            
+        # Check if total issue count decreased (heuristic for 'resolution')
+        # We allow partial resolution, but count must not increase or stay same if we started with issues.
+        if len(original_issues) > 0 and len(current_issues) >= len(original_issues):
+             return f"No issues were resolved (Count: {len(original_issues)} -> {len(current_issues)})."
+
+        return None

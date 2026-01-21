@@ -248,6 +248,7 @@ class RefactoringFlow(Flow[RefactoringState]):
             "project_key": self.state.project_key,
             "project_dir": project_dir,
             "errors": f"{json.dumps(self.state.issues)}\n\n{JAVA_COLLECTION_RULES}", # Passa issues + regole
+            "original_issues_list": self.state.issues,
             "start_line": 1,
             "line_count": total_lines
         }
