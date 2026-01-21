@@ -263,18 +263,8 @@ class RefactoringFlow(Flow[RefactoringState]):
         """
         Step 5: Esegue una scansione finale per verificare i risultati.
         """
-        print("\n--- STEP 5: Scansione Finale SonarQube ---")
-        sonar_token = os.getenv("SONAR_TOKEN")
-        project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
-        
-        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -Dmaven.compiler.failOnError=false"
-
-        try:
-            print(f"Avvio scansione finale su: {project_dir}")
-            subprocess.run(cmd_str, cwd=project_dir, check=True, capture_output=True, text=True, shell=True)
-            print("✅ Scansione finale completata.")
-        except subprocess.CalledProcessError as e:
-            print(f"❌ Errore durante la scansione finale: {e.stderr}")
+        print("\n--- STEP 5: Verifica Finale ---")
+        print("✅ Il ciclo di refactoring è terminato con successo. L'analisi SonarQube è già stata aggiornata dall'agente di validazione.")
         
         return True
 

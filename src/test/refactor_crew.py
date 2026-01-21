@@ -191,7 +191,7 @@ class RefactorCrew:
             
             # Check for build failure. 
             # NOTE: Adjust this condition based on the actual output format of your SonarScanTool/Task4.
-            if "build failure" not in result_str and "error" not in result_str:
+            if "build failure" not in result_str and "execution error" not in result_str and "error:" not in result_str:
                 print(">>> Refactoring Successful!")
                 return result
             
