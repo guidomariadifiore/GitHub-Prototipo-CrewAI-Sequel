@@ -3,7 +3,7 @@ import subprocess
 import time
 import requests
 import json
-from typing import List, Optional, Type
+from typing import List, Optional, Type, Tuple
 from pydantic import BaseModel, Field
 
 from crewai import Agent, Crew, Process, Task, LLM, TaskOutput
@@ -190,6 +190,10 @@ class RefactorCrew:
         
         # Store the very original code to revert to if all attempts fail
         initial_code = inputs.get('code_class')
+        
+        # Track state for final decision
+        last_build_failed = True
+        last_issue_count = len(original_issues)
 
         for attempt in range(max_retries):
             print(f"\n=== Refactoring Attempt {attempt + 1}/{max_retries} ===")
@@ -210,6 +214,8 @@ class RefactorCrew:
             # Check for build failure. 
             build_failed = "build failure" in result_lower or "execution error" in result_lower or "error:" in result_lower
             
+            last_build_failed = build_failed
+            
             failure_reason = ""
             failure_details = ""
 
@@ -225,7 +231,10 @@ class RefactorCrew:
             else:
                 # Build Success - Now Verify Issues
                 print(">>> Build Successful. Verifying SonarQube issues...")
-                verification_error = self._verify_refactoring(project_key, project_dir, file_path_full, original_issues)
+                verification_error, current_count = self._verify_refactoring(project_key, project_dir, file_path_full, original_issues)
+                
+                if current_count != -1:
+                    last_issue_count = current_count
                 
                 if not verification_error:
                     print(">>> Refactoring Verified! Issues resolved.")
@@ -241,16 +250,27 @@ class RefactorCrew:
             summary = ""
             
             if build_failed:
-                # Case 1: Build Failed -> Revert to state at start of this attempt (inputs['code_class'])
-                print(">>> Reverting changes due to build failure...")
-                recovery_crew = Crew(
-                    agents=[self.code_replacer(), self.errors_summarizer()],
-                    tasks=[self.conditional_task5(), self.conditional_task6()],
+                # Case 1: Build Failed -> Keep changes (broken code), update inputs['code_class'] for next attempt
+                print(">>> Keeping changes despite build failure.")
+                
+                # Only run summarizer (Task 6)
+                summarize_crew = Crew(
+                    agents=[self.errors_summarizer()],
+                    tasks=[self.conditional_task6()],
                     process=Process.sequential,
                     verbose=True
                 )
-                summary = recovery_crew.kickoff(inputs=inputs)
-                inputs['previous_code_context'] = f"Attempt {attempt+1} failed (Build Error). Code reverted. Fix errors."
+                summary = summarize_crew.kickoff(inputs=inputs)
+                
+                # Update inputs['code_class'] with the current file content so next attempt builds upon this
+                try:
+                    with open(file_path_full, 'r', encoding='utf-8') as f:
+                        current_content = f.read()
+                    inputs['code_class'] = current_content
+                except Exception as e:
+                    print(f"Error reading updated file: {e}")
+                
+                inputs['previous_code_context'] = f"Attempt {attempt+1} failed (Build Error). Code KEPT. Fix build errors."
             else:
                 # Case 2: Verification Failed -> Keep changes, update inputs['code_class'] for next attempt
                 print(">>> Keeping changes despite verification failure (Build passed).")
@@ -286,32 +306,45 @@ class RefactorCrew:
                     break
             
         print(">>> Max retries reached. Giving up on this file.")
-        print(">>> Reverting to ORIGINAL state (before any attempts).")
-        try:
-            with open(file_path_full, 'w', encoding='utf-8') as f:
-                f.write(initial_code)
-            print(">>> Revert complete.")
-        except Exception as e:
-            print(f"Error reverting to original: {e}")
+        
+        should_revert = False
+        if last_build_failed:
+            print(">>> Final Decision: Revert. Reason: Last build failed.")
+            should_revert = True
+        elif last_issue_count > len(original_issues):
+            print(f">>> Final Decision: Revert. Reason: Issue count increased ({last_issue_count} > {len(original_issues)}).")
+            should_revert = True
+        else:
+            print(f">>> Final Decision: Keep. Reason: Build passed and issue count did not increase ({last_issue_count} <= {len(original_issues)}).")
+            should_revert = False
+
+        if should_revert:
+            print(">>> Reverting to ORIGINAL state (before any attempts).")
+            try:
+                with open(file_path_full, 'w', encoding='utf-8') as f:
+                    f.write(initial_code)
+                print(">>> Revert complete.")
+            except Exception as e:
+                print(f"Error reverting to original: {e}")
             
         return "Refactoring failed after 3 attempts."
 
-    def _verify_refactoring(self, project_key: str, project_dir: str, file_path_full: str, original_issues: list) -> Optional[str]:
+    def _verify_refactoring(self, project_key: str, project_dir: str, file_path_full: str, original_issues: list) -> Tuple[Optional[str], int]:
         """
         Verifies if the refactoring resolved original issues and didn't introduce new ones.
-        Returns None if successful, or an error message string if verification failed.
+        Returns (error_message, current_issue_count). error_message is None if successful.
         """
         sonar_token = os.getenv("SONAR_TOKEN")
         sonar_url = os.getenv("SONAR_HOST_URL", "http://localhost:9000")
         
         if not sonar_token:
-            return "SONAR_TOKEN not set, cannot verify."
+            return "SONAR_TOKEN not set, cannot verify.", -1
 
         # Calculate relative path for SonarQube component key
         try:
             relative_path = os.path.relpath(file_path_full, project_dir).replace("\\", "/")
         except ValueError:
-            return f"Could not determine relative path for {file_path_full} relative to {project_dir}"
+            return f"Could not determine relative path for {file_path_full} relative to {project_dir}", -1
 
         component_key = f"{project_key}:{relative_path}"
         
@@ -327,8 +360,9 @@ class RefactorCrew:
             response.raise_for_status()
             data = response.json()
             current_issues = data.get("issues", [])
+            current_count = len(current_issues)
         except Exception as e:
-            return f"Error querying SonarQube API: {str(e)}"
+            return f"Error querying SonarQube API: {str(e)}", -1
 
         # Check for NEW issues (Regressions) - Corresponds to "New Issues" tab in SonarQube
         try:
@@ -344,9 +378,21 @@ class RefactorCrew:
                 details = []
                 for issue in issues:
                     details.append(f"- Line {issue.get('line', '?')}: [{issue.get('rule', 'Unknown')}] {issue.get('message', '')}")
-                return f"Refactoring introduced {total_new} NEW issues (regressions):\n" + "\n".join(details)
+                return f"Refactoring introduced {total_new} NEW issues (regressions):\n" + "\n".join(details), current_count
         except Exception as e:
             print(f"Warning: Could not check new code period issues: {e}")
+
+        # Strict check: Any issue key in current_issues that was not in original_issues is a new issue.
+        original_keys = {issue.get("key") for issue in original_issues}
+        current_keys = {issue.get("key") for issue in current_issues}
+        new_keys = current_keys - original_keys
+        
+        if new_keys:
+            new_issues_list = [i for i in current_issues if i.get("key") in new_keys]
+            details = []
+            for issue in new_issues_list:
+                 details.append(f"- Line {issue.get('line', '?')}: [{issue.get('rule', 'Unknown')}] {issue.get('message', '')}")
+            return f"Refactoring introduced {len(new_keys)} NEW issues (Key mismatch):\n" + "\n".join(details), current_count
 
         original_rules = {issue.get("rule") for issue in original_issues}
         current_rules = {issue.get("rule") for issue in current_issues}
@@ -354,11 +400,11 @@ class RefactorCrew:
         # Check for new issue types (regressions)
         new_rules = current_rules - original_rules
         if new_rules:
-            return f"New issue types introduced: {', '.join(new_rules)}"
+            return f"New issue types introduced: {', '.join(new_rules)}", current_count
             
         # Check if total issue count decreased (heuristic for 'resolution')
         # We allow partial resolution, but count must not increase or stay same if we started with issues.
         if len(original_issues) > 0 and len(current_issues) >= len(original_issues):
-             return f"No issues were resolved (Count: {len(original_issues)} -> {len(current_issues)})."
+             return f"No issues were resolved (Count: {len(original_issues)} -> {len(current_issues)}).", current_count
 
-        return None
+        return None, current_count
