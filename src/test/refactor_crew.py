@@ -187,6 +187,9 @@ class RefactorCrew:
         project_key = inputs.get('project_key')
         project_dir = inputs.get('project_dir')
         file_path_full = inputs.get('path_class')
+        
+        # Store the very original code to revert to if all attempts fail
+        initial_code = inputs.get('code_class')
 
         for attempt in range(max_retries):
             print(f"\n=== Refactoring Attempt {attempt + 1}/{max_retries} ===")
@@ -233,21 +236,49 @@ class RefactorCrew:
             
             print(f">>> {failure_reason}. Initiating recovery (Attempt {attempt + 1})...")
             
-            # Phase 2: Revert and Summarize
-            # We explicitly select tasks 5-6
             inputs['current_failure_reason'] = f"{failure_reason}\n\nDETAILS:\n{failure_details}"
-            recovery_crew = Crew(
-                agents=[self.code_replacer(), self.errors_summarizer()],
-                tasks=[self.conditional_task5(), self.conditional_task6()],
-                process=Process.sequential,
-                verbose=True
-            )
             
-            summary = recovery_crew.kickoff(inputs=inputs)
+            summary = ""
+            
+            if build_failed:
+                # Case 1: Build Failed -> Revert to state at start of this attempt (inputs['code_class'])
+                print(">>> Reverting changes due to build failure...")
+                recovery_crew = Crew(
+                    agents=[self.code_replacer(), self.errors_summarizer()],
+                    tasks=[self.conditional_task5(), self.conditional_task6()],
+                    process=Process.sequential,
+                    verbose=True
+                )
+                summary = recovery_crew.kickoff(inputs=inputs)
+                inputs['previous_code_context'] = f"Attempt {attempt+1} failed (Build Error). Code reverted. Fix errors."
+            else:
+                # Case 2: Verification Failed -> Keep changes, update inputs['code_class'] for next attempt
+                print(">>> Keeping changes despite verification failure (Build passed).")
+                
+                # Only run summarizer (Task 6)
+                summarize_crew = Crew(
+                    agents=[self.errors_summarizer()],
+                    tasks=[self.conditional_task6()],
+                    process=Process.sequential,
+                    verbose=True
+                )
+                summary = summarize_crew.kickoff(inputs=inputs)
+                
+                # Update inputs['code_class'] with the current file content so next attempt builds upon this
+                try:
+                    with open(file_path_full, 'r', encoding='utf-8') as f:
+                        current_content = f.read()
+                    inputs['code_class'] = current_content
+                except Exception as e:
+                    print(f"Error reading updated file: {e}")
+                
+                inputs['previous_code_context'] = f"Attempt {attempt+1} failed (Verification Error). Code KEPT. Fix new issues."
             
             # Update inputs for the next iteration
             inputs['previous_errors'] = str(summary)
-            inputs['previous_code_context'] = f"Attempt {attempt+1} failed. Reason: {failure_reason}. Code was reverted. Please fix."
+            
+            print("\n⏳ API Rate Limit Cooldown: Waiting 60 seconds...")
+            time.sleep(60)
             
             print("\n🛑 PAUSED: Press 'U' and Enter to resume next attempt...")
             while True:
@@ -255,6 +286,14 @@ class RefactorCrew:
                     break
             
         print(">>> Max retries reached. Giving up on this file.")
+        print(">>> Reverting to ORIGINAL state (before any attempts).")
+        try:
+            with open(file_path_full, 'w', encoding='utf-8') as f:
+                f.write(initial_code)
+            print(">>> Revert complete.")
+        except Exception as e:
+            print(f"Error reverting to original: {e}")
+            
         return "Refactoring failed after 3 attempts."
 
     def _verify_refactoring(self, project_key: str, project_dir: str, file_path_full: str, original_issues: list) -> Optional[str]:
