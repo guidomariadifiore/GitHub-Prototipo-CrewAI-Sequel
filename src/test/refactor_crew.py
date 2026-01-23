@@ -13,7 +13,7 @@ from file_tools import FileUpdateTool
 
 # Assicurati che questi import puntino ai tuoi file corretti o definisci le costanti qui
 # Se non hai il file constants.py, modifica DIRECTORY_REPOS con il path assoluto della cartella dei progetti
-from constants import DIRECTORY_REPOS
+from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES
 
 class FilePatchToolSchema(BaseModel):
     """Input for FilePatchTool."""
@@ -194,6 +194,9 @@ class RefactorCrew:
         # Track state for final decision
         last_build_failed = True
         last_issue_count = len(original_issues)
+        last_successful_code = initial_code
+        last_successful_issue_count = len(original_issues)
+        current_issues_list = original_issues
 
         for attempt in range(max_retries):
             print(f"\n=== Refactoring Attempt {attempt + 1}/{max_retries} ===")
@@ -231,10 +234,22 @@ class RefactorCrew:
             else:
                 # Build Success - Now Verify Issues
                 print(">>> Build Successful. Verifying SonarQube issues...")
-                verification_error, current_count = self._verify_refactoring(project_key, project_dir, file_path_full, original_issues)
+                
+                # Save successful state
+                try:
+                    with open(file_path_full, 'r', encoding='utf-8') as f:
+                        last_successful_code = f.read()
+                except Exception as e:
+                    print(f"Error reading file state: {e}")
+
+                verification_error, current_count, current_issues_list = self._verify_refactoring(project_key, project_dir, file_path_full, original_issues)
                 
                 if current_count != -1:
                     last_issue_count = current_count
+                    last_successful_issue_count = current_count
+                    
+                    # CRITICAL: Update inputs['errors'] so the next agent sees the ACTUAL current issues, not the old ones
+                    inputs['errors'] = f"{json.dumps(current_issues_list)}\n\n{JAVA_COLLECTION_RULES}"
                 
                 if not verification_error:
                     print(">>> Refactoring Verified! Issues resolved.")
@@ -246,6 +261,7 @@ class RefactorCrew:
             print(f">>> {failure_reason}. Initiating recovery (Attempt {attempt + 1})...")
             
             inputs['current_failure_reason'] = f"{failure_reason}\n\nDETAILS:\n{failure_details}"
+            print(f"\n[DEBUG] Context sent to Errors Summarizer:\n{'-'*40}\n{inputs['current_failure_reason']}\n{'-'*40}\n")
             
             summary = ""
             
@@ -297,54 +313,83 @@ class RefactorCrew:
             # Update inputs for the next iteration
             inputs['previous_errors'] = str(summary)
             
-            print("\n⏳ API Rate Limit Cooldown: Waiting 60 seconds...")
-            time.sleep(60)
+            #print("\n⏳ API Rate Limit Cooldown: Waiting 60 seconds...")
+            #time.sleep(60)
             
-            print("\n🛑 PAUSED: Press 'U' and Enter to resume next attempt...")
-            while True:
-                if input().strip().upper() == 'U':
-                    break
+            #print("\n🛑 PAUSED: Press 'U' and Enter to resume next attempt...")
+            #while True:
+            #    if input().strip().upper() == 'U':
+            #        break
             
         print(">>> Max retries reached. Giving up on this file.")
         
-        should_revert = False
-        if last_build_failed:
-            print(">>> Final Decision: Revert. Reason: Last build failed.")
-            should_revert = True
-        elif last_issue_count > len(original_issues):
-            print(f">>> Final Decision: Revert. Reason: Issue count increased ({last_issue_count} > {len(original_issues)}).")
-            should_revert = True
-        else:
-            print(f">>> Final Decision: Keep. Reason: Build passed and issue count did not increase ({last_issue_count} <= {len(original_issues)}).")
-            should_revert = False
+        code_to_restore = None
+        final_issue_count = last_issue_count
 
-        if should_revert:
-            print(">>> Reverting to ORIGINAL state (before any attempts).")
+        if last_build_failed:
+            print(">>> Last attempt failed build. Reverting to latest successful build version.")
+            code_to_restore = last_successful_code
+            final_issue_count = last_successful_issue_count
+        
+        if final_issue_count > len(original_issues):
+            print(f">>> Final version has more issues ({final_issue_count}) than original ({len(original_issues)}). Reverting to ORIGINAL.")
+            code_to_restore = initial_code
+        elif code_to_restore:
+             print(f">>> Restoring selected version (Issues: {final_issue_count}).")
+
+        if code_to_restore:
             try:
                 with open(file_path_full, 'w', encoding='utf-8') as f:
-                    f.write(initial_code)
-                print(">>> Revert complete.")
+                    f.write(code_to_restore)
+                print(">>> Restore complete.")
             except Exception as e:
-                print(f"Error reverting to original: {e}")
+                print(f"Error restoring code: {e}")
             
         return "Refactoring failed after 3 attempts."
 
-    def _verify_refactoring(self, project_key: str, project_dir: str, file_path_full: str, original_issues: list) -> Tuple[Optional[str], int]:
+    def _wait_for_processing(self, project_key: str, sonar_token: str, sonar_url: str):
+        """Waits for SonarQube Compute Engine to finish processing the submitted report."""
+        print(">>> Waiting for SonarQube Compute Engine to finish processing...")
+        api_url = f"{sonar_url}/api/ce/component"
+        params = {"component": project_key}
+        
+        # Wait up to 60 seconds
+        for _ in range(30):
+            try:
+                response = requests.get(api_url, auth=(sonar_token, ""), params=params)
+                response.raise_for_status()
+                data = response.json()
+                
+                # If queue is empty and no current task, processing is done
+                if not data.get("queue") and not data.get("current"):
+                    print(">>> SonarQube processing complete.")
+                    return
+                
+                time.sleep(2)
+            except Exception as e:
+                print(f"Warning: Error checking CE status: {e}")
+                time.sleep(2)
+        print(">>> Warning: Timed out waiting for SonarQube processing. Results may be stale.")
+
+    def _verify_refactoring(self, project_key: str, project_dir: str, file_path_full: str, original_issues: list) -> Tuple[Optional[str], int, List[dict]]:
         """
         Verifies if the refactoring resolved original issues and didn't introduce new ones.
-        Returns (error_message, current_issue_count). error_message is None if successful.
+        Returns (error_message, current_issue_count, current_issues_list). error_message is None if successful.
         """
         sonar_token = os.getenv("SONAR_TOKEN")
         sonar_url = os.getenv("SONAR_HOST_URL", "http://localhost:9000")
         
         if not sonar_token:
-            return "SONAR_TOKEN not set, cannot verify.", -1
+            return "SONAR_TOKEN not set, cannot verify.", -1, []
+            
+        # Ensure the latest analysis is processed before querying
+        self._wait_for_processing(project_key, sonar_token, sonar_url)
 
         # Calculate relative path for SonarQube component key
         try:
             relative_path = os.path.relpath(file_path_full, project_dir).replace("\\", "/")
         except ValueError:
-            return f"Could not determine relative path for {file_path_full} relative to {project_dir}", -1
+            return f"Could not determine relative path for {file_path_full} relative to {project_dir}", -1, []
 
         component_key = f"{project_key}:{relative_path}"
         
@@ -362,13 +407,16 @@ class RefactorCrew:
             current_issues = data.get("issues", [])
             current_count = len(current_issues)
         except Exception as e:
-            return f"Error querying SonarQube API: {str(e)}", -1
+            return f"Error querying SonarQube API: {str(e)}", -1, []
 
         # Check for NEW issues (Regressions) - Corresponds to "New Issues" tab in SonarQube
         try:
-            params_new = params.copy()
-            params_new["inNewCodePeriod"] = "true"
-            params_new["ps"] = 50
+            params_new = {
+                "componentKeys": component_key,
+                "inNewCodePeriod": "true",
+                "resolved": "false",
+                "ps": 50
+            }
             resp_new = requests.get(api_url, auth=(sonar_token, ""), params=params_new)
             resp_new.raise_for_status()
             new_data = resp_new.json()
@@ -378,21 +426,9 @@ class RefactorCrew:
                 details = []
                 for issue in issues:
                     details.append(f"- Line {issue.get('line', '?')}: [{issue.get('rule', 'Unknown')}] {issue.get('message', '')}")
-                return f"Refactoring introduced {total_new} NEW issues (regressions):\n" + "\n".join(details), current_count
+                return f"Refactoring introduced {total_new} NEW issues (regressions):\n" + "\n".join(details), current_count, current_issues
         except Exception as e:
             print(f"Warning: Could not check new code period issues: {e}")
-
-        # Strict check: Any issue key in current_issues that was not in original_issues is a new issue.
-        original_keys = {issue.get("key") for issue in original_issues}
-        current_keys = {issue.get("key") for issue in current_issues}
-        new_keys = current_keys - original_keys
-        
-        if new_keys:
-            new_issues_list = [i for i in current_issues if i.get("key") in new_keys]
-            details = []
-            for issue in new_issues_list:
-                 details.append(f"- Line {issue.get('line', '?')}: [{issue.get('rule', 'Unknown')}] {issue.get('message', '')}")
-            return f"Refactoring introduced {len(new_keys)} NEW issues (Key mismatch):\n" + "\n".join(details), current_count
 
         original_rules = {issue.get("rule") for issue in original_issues}
         current_rules = {issue.get("rule") for issue in current_issues}
@@ -400,11 +436,11 @@ class RefactorCrew:
         # Check for new issue types (regressions)
         new_rules = current_rules - original_rules
         if new_rules:
-            return f"New issue types introduced: {', '.join(new_rules)}", current_count
+            return f"New issue types introduced: {', '.join(new_rules)}", current_count, current_issues
             
         # Check if total issue count decreased (heuristic for 'resolution')
         # We allow partial resolution, but count must not increase or stay same if we started with issues.
         if len(original_issues) > 0 and len(current_issues) >= len(original_issues):
-             return f"No issues were resolved (Count: {len(original_issues)} -> {len(current_issues)}).", current_count
+             return f"No issues were resolved (Count: {len(original_issues)} -> {len(current_issues)}).", current_count, current_issues
 
-        return None, current_count
+        return None, current_count, current_issues
