@@ -16,7 +16,7 @@ from crewai import LLM
 
 # Assicurati che questi import siano corretti rispetto alla tua struttura cartelle
 from refactor_crew import RefactorCrew
-from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES, MAVEN_DEPENDENCIES
+from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES, MAVEN_DEPENDENCIES, CUSTOM_RULES
 
 
 # Definiamo lo stato del flusso
@@ -240,6 +240,24 @@ class RefactoringFlow(Flow[RefactoringState]):
         total_lines = len(self.state.file_content.splitlines())
         print(f"--- Using Full File Content ({total_lines} lines) ---")
 
+        # Fetch detailed rule descriptions from SonarQube API
+        sonar_token = os.getenv("SONAR_TOKEN")
+        unique_rules = list(set(issue.get("rule") for issue in self.state.issues if issue.get("rule")))
+        rule_details_text = ""
+
+        if unique_rules:
+            print(f"Fetching details for {len(unique_rules)} rules from SonarQube...")
+            for rule_key in unique_rules:
+                try:
+                    resp = requests.get("http://localhost:9000/api/rules/show", auth=(sonar_token, ""), params={"key": rule_key})
+                    if resp.status_code == 200:
+                        rule_data = resp.json().get("rule", {})
+                        # Prefer markdown description, fallback to html or generic description
+                        desc = rule_data.get("mdDesc") or rule_data.get("htmlDesc") or rule_data.get("description") or ""
+                        rule_details_text += f"\n\n--- RULE {rule_key}: {rule_data.get('name', '')} ---\n{desc}"
+                except Exception as e:
+                    print(f"⚠️ Failed to fetch rule {rule_key}: {e}")
+
         project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
 
         inputs = {
@@ -247,7 +265,7 @@ class RefactoringFlow(Flow[RefactoringState]):
             "path_class": full_file_path,
             "project_key": self.state.project_key,
             "project_dir": project_dir,
-            "errors": f"{json.dumps(self.state.issues)}\n\n{JAVA_COLLECTION_RULES}", # Passa issues + regole
+            "errors": f"{json.dumps(self.state.issues)}\n\n{JAVA_COLLECTION_RULES}\n\n{CUSTOM_RULES}\n\nSONARQUBE RULE DETAILS:{rule_details_text}", # Passa issues + regole + dettagli API
             "original_issues_list": self.state.issues,
             "start_line": 1,
             "line_count": total_lines

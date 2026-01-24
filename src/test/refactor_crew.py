@@ -13,7 +13,7 @@ from file_tools import FileUpdateTool
 
 # Assicurati che questi import puntino ai tuoi file corretti o definisci le costanti qui
 # Se non hai il file constants.py, modifica DIRECTORY_REPOS con il path assoluto della cartella dei progetti
-from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES
+from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES, CUSTOM_RULES
 
 class FilePatchToolSchema(BaseModel):
     """Input for FilePatchTool."""
@@ -73,7 +73,7 @@ class SonarScanTool(BaseTool):
             return "Error: SONAR_TOKEN environment variable not set."
 
         # Command exactly as used in main.py
-        cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -Dmaven.compiler.failOnError=false"
+        cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
         
         try:
             # cwd=project_dir ensures we run in the correct folder
@@ -179,10 +179,10 @@ class RefactorCrew:
 
     def run_refactoring_cycle(self, inputs: dict):
         """
-        Executes the refactoring flow with retry logic (max 3 attempts).
+        Executes the refactoring flow with retry logic (max 4 attempts).
         Flow: Refactor -> Scan -> (If Fail: Revert -> Summarize -> Retry)
         """
-        max_retries = 3
+        max_retries = 4
         original_issues = inputs.get('original_issues_list', [])
         project_key = inputs.get('project_key')
         project_dir = inputs.get('project_dir')
@@ -215,7 +215,7 @@ class RefactorCrew:
             result_lower = result_str.lower()
             
             # Check for build failure. 
-            build_failed = "build failure" in result_lower or "execution error" in result_lower or "error:" in result_lower
+            build_failed = "build failure" in result_lower or "execution error" in result_lower or "error:" in result_lower or "[error]" in result_lower
             
             last_build_failed = build_failed
             
@@ -249,7 +249,7 @@ class RefactorCrew:
                     last_successful_issue_count = current_count
                     
                     # CRITICAL: Update inputs['errors'] so the next agent sees the ACTUAL current issues, not the old ones
-                    inputs['errors'] = f"{json.dumps(current_issues_list)}\n\n{JAVA_COLLECTION_RULES}"
+                    inputs['errors'] = f"{json.dumps(current_issues_list)}\n\n{JAVA_COLLECTION_RULES}\n\n{CUSTOM_RULES}"
                 
                 if not verification_error:
                     print(">>> Refactoring Verified! Issues resolved.")
@@ -345,7 +345,7 @@ class RefactorCrew:
             except Exception as e:
                 print(f"Error restoring code: {e}")
             
-        return "Refactoring failed after 3 attempts."
+        return f"Refactoring failed after {max_retries} attempts."
 
     def _wait_for_processing(self, project_key: str, sonar_token: str, sonar_url: str):
         """Waits for SonarQube Compute Engine to finish processing the submitted report."""

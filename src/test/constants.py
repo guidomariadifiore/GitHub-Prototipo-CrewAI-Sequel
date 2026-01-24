@@ -82,3 +82,21 @@ MAVEN_DEPENDENCIES = {
             <version>4.4</version>
         </dependency>"""
 }
+
+CUSTOM_RULES = """
+SPECIFIC REFACTORING RULES:
+
+1. **Rule**: `creedengo-java:GCI28` ("Optimize read file exceptions")
+   - **CRITICAL INSTRUCTION**: You are STRICTLY FORBIDDEN from using `try-catch` blocks for this rule.
+   - **Requirement**: Use a conditional check (if-statement) to validate state.
+   - **Correct Pattern**:
+     ```java
+     if (condition_fails) { 
+         throw new SpecificException("brief description"); 
+     }
+     ```
+   - **Incorrect Pattern (NEVER USE)**:
+     ```java
+     try { ... } catch (Exception e) { throw new SpecificException(...); }
+     ```
+"""
