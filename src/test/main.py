@@ -18,6 +18,24 @@ from crewai import LLM
 from refactor_crew import RefactorCrew
 from constants import DIRECTORY_REPOS, JAVA_COLLECTION_RULES, MAVEN_DEPENDENCIES, CUSTOM_RULES
 
+IGNORE_LIST_FILE = "ignore_list.json"
+
+def load_ignore_list():
+    if os.path.exists(IGNORE_LIST_FILE):
+        try:
+            with open(IGNORE_LIST_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def add_to_ignore_list(file_path):
+    ignored = load_ignore_list()
+    if file_path not in ignored:
+        ignored.append(file_path)
+        with open(IGNORE_LIST_FILE, "w", encoding="utf-8") as f:
+            json.dump(ignored, f, indent=4)
+    print(f"🚫 Added {file_path} to ignore list.")
 
 # Definiamo lo stato del flusso
 class RefactoringState(BaseModel):
@@ -94,13 +112,21 @@ class RefactoringFlow(Flow[RefactoringState]):
                 return False # Interrompiamo se non ci sono file
 
             # Seleziona il file con il minor numero di problemi tra i top 10
-            top_10_files = sorted(file_facet["values"], key=lambda x: x["count"])
+            # Filter out ignored files
+            ignored_files = load_ignore_list()
+            sorted_files = sorted(file_facet["values"], key=lambda x: x["count"])
             
-            if not top_10_files:
-                print("✅ Nessun file con issue nella top 10.")
+            target_file = None
+            for f in sorted_files:
+                f_path = f["val"].split(":", 1)[-1]
+                if f_path not in ignored_files:
+                    target_file = f
+                    break
+            
+            if not target_file:
+                print("✅ Nessun file idoneo trovato (tutti ignorati o nessun problema).")
                 return False
 
-            target_file = top_10_files[0]
             self.state.file_path = target_file["val"].split(":", 1)[-1]
             
             print(f"\n--- FILE TARGET SELEZIONATO ---")
@@ -272,7 +298,13 @@ class RefactoringFlow(Flow[RefactoringState]):
         }
 
         print("Avvio RefactorCrew con tutte le issue...")
-        RefactorCrew(llm=self.llm).run_refactoring_cycle(inputs=inputs)
+        result = RefactorCrew(llm=self.llm).run_refactoring_cycle(inputs=inputs)
+        
+        if result is False:
+            print(f"❌ Refactoring failed for {self.state.file_path}. Adding to ignore list.")
+            add_to_ignore_list(self.state.file_path)
+            return False
+
         print("--- Refactoring completato ---")
         
         return True

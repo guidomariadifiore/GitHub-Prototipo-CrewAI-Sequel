@@ -345,7 +345,7 @@ class RefactorCrew:
             except Exception as e:
                 print(f"Error restoring code: {e}")
             
-        return f"Refactoring failed after {max_retries} attempts."
+        return False
 
     def _wait_for_processing(self, project_key: str, sonar_token: str, sonar_url: str):
         """Waits for SonarQube Compute Engine to finish processing the submitted report."""
