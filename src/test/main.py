@@ -32,7 +32,7 @@ class RefactoringState(BaseModel):
 
 class RefactoringFlow(Flow[RefactoringState]):
     llm = LLM(
-        model="gemini-2.0-flash", # Changed for better tool execution reliability
+        model="gemini-2.5-flash", # Changed for better tool execution reliability
         api_key=os.getenv("GEMINI_API_KEY"),
         temperature=0.2
     )
