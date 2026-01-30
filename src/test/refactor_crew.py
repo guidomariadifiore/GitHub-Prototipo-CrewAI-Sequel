@@ -130,7 +130,10 @@ class RefactorCrew:
 
     @task
     def task2(self) -> Task:
-        return Task(config=self.tasks_config['task2'], verbose=True)
+        t = Task(config=self.tasks_config['task2'], verbose=True, tools=[FileUpdateTool()])
+        # Move the strict tool usage instruction here so the Refactor Agent applies changes immediately
+        t.description += "\n\nCRITICAL: You MUST execute the 'Overwrite File Tool' to apply the changes. \n1. Pass the COMPLETE file content to the 'new_code' argument.\n2. Do NOT truncate the code. Do NOT use placeholders like '// ... rest of code'.\n3. Ensure the string is properly escaped if it contains quotes."
+        return t
 
     @task
     def task3(self) -> Task:
@@ -204,8 +207,8 @@ class RefactorCrew:
             # Phase 1: Refactor, Patch, and Scan
             # We explicitly select tasks 1-4
             refactor_crew = Crew(
-                agents=[self.query_writer(), self.code_refactor(), self.code_replacer(), self.sonar_agent()],
-                tasks=[self.task1(), self.task2(), self.task3(), self.task4()],
+                agents=[self.query_writer(), self.code_refactor(), self.sonar_agent()],
+                tasks=[self.task1(), self.task2(), self.task4()],
                 process=Process.sequential,
                 verbose=True
             )
