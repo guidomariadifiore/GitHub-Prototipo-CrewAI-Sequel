@@ -130,8 +130,11 @@ class RefactorCrew:
 
     @task
     def task2(self) -> Task:
-        return Task(config=self.tasks_config['task2'], verbose=True)
-
+        t = Task(config=self.tasks_config['task2'], verbose=True)
+        # promemoria "anti-pigrizia" per l'LLM
+        t.description += "\n\nIMPORTANT: Do NOT be lazy. You must output the full file content including all imports and unchanged methods. If you use placeholders like '// ...' the code will be broken."
+        return t
+    
     @task
     def task3(self) -> Task:
         t = Task(config=self.tasks_config['task3'], verbose=True, tools=[FileUpdateTool()])
@@ -201,17 +204,56 @@ class RefactorCrew:
         for attempt in range(max_retries):
             print(f"\n=== Refactoring Attempt {attempt + 1}/{max_retries} ===")
             
-            # Phase 1: Refactor, Patch, and Scan
-            # We explicitly select tasks 1-4
-            refactor_crew = Crew(
-                agents=[self.query_writer(), self.code_refactor(), self.code_replacer(), self.sonar_agent()],
-                tasks=[self.task1(), self.task2(), self.task3(), self.task4()],
+            # FASE 1: Generazione del Codice (Solo Task 1 e Task 2)
+            # Rimuoviamo code_replacer e sonar_agent da questa prima esecuzione
+            generation_crew = Crew(
+                agents=[self.query_writer(), self.code_refactor()],
+                tasks=[self.task1(), self.task2()], # Task 1: Prompt, Task 2: Code
                 process=Process.sequential,
                 verbose=True
             )
             
-            result = refactor_crew.kickoff(inputs=inputs)
-            result_str = str(result)
+            # Eseguiamo solo la generazione
+            refactored_code_output = generation_crew.kickoff(inputs=inputs)
+            
+            # Estrarre la stringa del codice dall'output
+            # (CrewAI restituisce un oggetto CrewOutput, convertiamolo in stringa pulita)
+            new_code_content = str(refactored_code_output).strip()
+            
+            # PULIZIA EXTRA (Opzionale ma consigliata): 
+            # Rimuove eventuali blocchi markdown ```java ... ``` se l'LLM li ha lasciati
+            if new_code_content.startswith("```"):
+                lines = new_code_content.splitlines()
+                # Rimuove la prima riga se è ```java e l'ultima se è ```
+                if lines[0].startswith("```"): lines = lines[1:]
+                if lines[-1].startswith("```"): lines = lines[:-1]
+                new_code_content = "\n".join(lines)
+
+            print(f">>> Salvataggio manuale del file ({len(new_code_content)} caratteri)...")
+            
+            # SALVATAGGIO DETERMINISTICO (Sostituisce il Task 3 / code_replacer)
+            try:
+                with open(file_path_full, 'w', encoding='utf-8') as f:
+                    f.write(new_code_content)
+                print("✅ File salvato correttamente via Python.")
+            except Exception as e:
+                print(f"❌ Errore critico nel salvataggio manuale: {e}")
+                return False
+
+            # FASE 2: Scansione e Verifica (Solo Task 4)
+            # Ora lanciamo una nuova crew solo per SonarQube, che leggerà il file appena salvato
+            scan_crew = Crew(
+                agents=[self.sonar_agent()],
+                tasks=[self.task4()],
+                process=Process.sequential,
+                verbose=True
+            )
+            
+            # Eseguiamo la scansione
+            scan_result = scan_crew.kickoff(inputs=inputs)
+            
+            result_str = str(scan_result)            
+            
             result_lower = result_str.lower()
             
             # Check for build failure. 
@@ -253,7 +295,7 @@ class RefactorCrew:
                 
                 if not verification_error:
                     print(">>> Refactoring Verified! Issues resolved.")
-                    return result
+                    return scan_result
                 else:
                     failure_reason = "Verification Failed"
                     failure_details = verification_error
