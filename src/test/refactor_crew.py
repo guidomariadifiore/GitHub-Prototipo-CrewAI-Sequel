@@ -257,7 +257,7 @@ class RefactorCrew:
             result_lower = result_str.lower()
             
             # Check for build failure. 
-            build_failed = "build failure" in result_lower or "execution error" in result_lower or "error:" in result_lower or "[error]" in result_lower
+            build_failed = "build failure" in result_lower or "execution error" in result_lower
             
             last_build_failed = build_failed
             
@@ -483,6 +483,10 @@ class RefactorCrew:
         # Check if total issue count decreased (heuristic for 'resolution')
         # We allow partial resolution, but count must not increase or stay same if we started with issues.
         if len(original_issues) > 0 and len(current_issues) >= len(original_issues):
-             return f"No issues were resolved (Count: {len(original_issues)} -> {len(current_issues)}).", current_count, current_issues
+             details = []
+             for issue in current_issues:
+                 details.append(f"- Line {issue.get('line', '?')}: [{issue.get('rule', 'Unknown')}] {issue.get('message', '')}")
+             details_str = "\n".join(details)
+             return f"No issues were resolved (Count: {len(original_issues)} -> {len(current_issues)}). The following issues remain:\n{details_str}", current_count, current_issues
 
         return None, current_count, current_issues

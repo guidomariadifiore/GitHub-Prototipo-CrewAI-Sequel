@@ -99,4 +99,7 @@ SPECIFIC REFACTORING RULES:
      ```java
      try { ... } catch (Exception e) { throw new SpecificException(...); }
      ```
+     
+2. **Rule**: `creedengo-java:GCI67` ("Use ++i instead of i++")
+   - **IDENTIFYING THE ISSUE TIP**: The fix for this issue is pretty self-explanatory from its name. However, note that "i" is a generic variable. It could also be "sum++", "x++", etc.
 """

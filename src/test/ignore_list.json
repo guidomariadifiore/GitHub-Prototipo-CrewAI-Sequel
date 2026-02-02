@@ -1,1 +1,5 @@
-["src/main/java/dataModel/DataToSave.java"]
+[
+    "src/main/java/dataModel/DataToSave.java",
+    "src/main/java/dataModel/ChessBoard.java",
+    "src/main/java/controller/ControllerScacchiera.java"
+]
