@@ -46,6 +46,7 @@ class RefactoringState(BaseModel):
     issues: list = []
     refactoring_valid: bool = False
     iteration: int = 0
+    target_files: list = []
 
 
 class RefactoringFlow(Flow[RefactoringState]):
@@ -78,7 +79,7 @@ class RefactoringFlow(Flow[RefactoringState]):
     @listen(select_project)
     def run_analysis_and_find_hotspots(self):
         """
-        Step 2: Esegue scansione SonarQube, trova i 10 file con più issue e seleziona quello con meno issue.
+        Step 2: Esegue scansione SonarQube e identifica i top 10 file con più issue.
         """
         print(f"\n--- STEP 2: Analisi Hotspots e Selezione File Target ---")
 
@@ -111,26 +112,25 @@ class RefactoringFlow(Flow[RefactoringState]):
                 print("✅ Nessun file con issue trovato.")
                 return False # Interrompiamo se non ci sono file
 
-            # Seleziona il file con il minor numero di problemi tra i top 10
+            # Seleziona i top 10 file con PIÙ problemi (ordine decrescente)
             # Filter out ignored files
             ignored_files = load_ignore_list()
-            sorted_files = sorted(file_facet["values"], key=lambda x: x["count"])
+            sorted_files = sorted(file_facet["values"], key=lambda x: x["count"], reverse=True)
             
-            target_file = None
+            valid_files = []
             for f in sorted_files:
                 f_path = f["val"].split(":", 1)[-1]
                 if f_path not in ignored_files:
-                    target_file = f
-                    break
+                    valid_files.append(f)
             
-            if not target_file:
+            # Prendiamo i primi 10
+            self.state.target_files = valid_files[:10]
+            
+            if not self.state.target_files:
                 print("✅ Nessun file idoneo trovato (tutti ignorati o nessun problema).")
                 return False
 
-            self.state.file_path = target_file["val"].split(":", 1)[-1]
-            
-            print(f"\n--- FILE TARGET SELEZIONATO ---")
-            print(f"File: {self.state.file_path} ({target_file['count']} issues)")
+            print(f"✅ Trovati {len(self.state.target_files)} file da analizzare in coda.")
 
         except (subprocess.CalledProcessError, requests.HTTPError) as e:
             error_details = e.stdout + "\n" + e.stderr if isinstance(e, subprocess.CalledProcessError) else e.response.text
@@ -140,7 +140,16 @@ class RefactoringFlow(Flow[RefactoringState]):
         
         return True
 
-    @listen(run_analysis_and_find_hotspots)
+    @router(run_analysis_and_find_hotspots)
+    def route_initial(self):
+        if self.state.target_files:
+            next_file = self.state.target_files.pop(0)
+            self.state.file_path = next_file["val"].split(":", 1)[-1]
+            print(f"\n--- INIZIO CICLO PER: {self.state.file_path} ({next_file['count']} issues) ---")
+            return "process_file"
+        return "completed"
+
+    @listen("process_file")
     def get_issues_for_file(self):
         """
         Step 3: Recupera le issue per il file selezionato.
@@ -318,6 +327,16 @@ class RefactoringFlow(Flow[RefactoringState]):
         print("✅ Il ciclo di refactoring è terminato con successo. L'analisi SonarQube è già stata aggiornata dall'agente di validazione.")
         
         return True
+
+    @router(final_analysis)
+    def route_loop(self):
+        if self.state.target_files:
+            next_file = self.state.target_files.pop(0)
+            self.state.file_path = next_file["val"].split(":", 1)[-1]
+            print(f"\n--- INIZIO CICLO PER: {self.state.file_path} ({next_file['count']} issues) ---")
+            return "process_file"
+        print("\n✅ Tutti i file in coda sono stati processati.")
+        return "completed"
 
 def kickoff():
     refactoring_flow = RefactoringFlow()

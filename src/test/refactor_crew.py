@@ -166,13 +166,16 @@ class RefactorCrew:
 
     @task
     def task1(self) -> Task:
-        return Task(config=self.tasks_config["task1"], verbose=True)
+        t = Task(config=self.tasks_config["task1"], verbose=True)
+        t.description += "\n\nCONTEXT FROM PREVIOUS ATTEMPT (If any):\n{previous_errors}"
+        return t
 
     @task
     def task2(self) -> Task:
         t = Task(config=self.tasks_config["task2"], verbose=True)
         # promemoria "anti-pigrizia" per l'LLM
         t.description += "\n\nIMPORTANT: Do NOT be lazy. You must output the full file content including all imports and unchanged methods. If you use placeholders like '// ...' the code will be broken."
+        t.description += "\n\nCONTEXT FROM PREVIOUS ATTEMPT (If any):\n{previous_errors}"
         return t
 
     @task
@@ -229,6 +232,9 @@ class RefactorCrew:
         project_key = inputs.get("project_key")
         project_dir = inputs.get("project_dir")
         file_path_full = inputs.get("path_class")
+
+        # Initialize previous_errors to ensure the placeholder in Task 1/2 has a value on the first run
+        inputs.setdefault("previous_errors", "None (First Attempt - No previous errors)")
 
         # Store the very original code to revert to if all attempts fail
         initial_code = inputs.get("code_class")
