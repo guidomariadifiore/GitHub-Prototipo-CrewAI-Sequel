@@ -285,19 +285,33 @@ class RefactorCrew:
                 print(f"❌ Errore critico nel salvataggio manuale: {e}")
                 return False
 
-            # FASE 2: Scansione e Verifica (Solo Task 4)
-            # Ora lanciamo una nuova crew solo per SonarQube, che leggerà il file appena salvato
-            scan_crew = Crew(
-                agents=[self.sonar_agent()],
-                tasks=[self.task4()],
-                process=Process.sequential,
-                verbose=True,
-            )
+            # FASE 2: Scansione e Verifica (Deterministica via Python)
+            print(">>> Avvio scansione SonarQube (Deterministica)...")
+            
+            sonar_token = os.getenv("SONAR_TOKEN")
+            result_str = ""
 
-            # Eseguiamo la scansione
-            scan_result = scan_crew.kickoff(inputs=inputs)
+            if not sonar_token:
+                result_str = "Error: SONAR_TOKEN environment variable not set."
+            else:
+                cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
 
-            result_str = str(scan_result)
+                try:
+                    result = subprocess.run(
+                        cmd, cwd=project_dir, shell=True, capture_output=True, text=True
+                    )
+
+                    # Save full log to file for error summarizer
+                    log_path = os.path.join(project_dir, "maven_build_log.txt")
+                    with open(log_path, "w", encoding="utf-8") as f:
+                        f.write(f"STDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}")
+
+                    if result.returncode != 0:
+                        result_str = f"BUILD FAILURE. Check maven_build_log.txt for details.\n{result.stdout[-1000:]}"
+                    else:
+                        result_str = f"BUILD SUCCESS:\n{result.stdout}"
+                except Exception as e:
+                    result_str = f"Execution Error: {str(e)}"
 
             result_lower = result_str.lower()
 
@@ -348,7 +362,7 @@ class RefactorCrew:
 
                 if not verification_error:
                     print(">>> Refactoring Verified! Issues resolved.")
-                    return scan_result
+                    return result_str
                 else:
                     failure_reason = "Verification Failed"
                     failure_details = verification_error
