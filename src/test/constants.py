@@ -4,7 +4,7 @@ import os
 # Esempio Windows: "C:\\Users\\Nome\\Documents\\JavaProjects"
 # Esempio Mac/Linux: "/home/user/java_projects"
 
-DIRECTORY_REPOS = "C:\\Users\\lampa\\Documents\\GitHub"
+DIRECTORY_REPOS = "C:\\Users\\lampa\\Documents\\GitHub" # CHANGE HERE TO CHANGE PROJECTS DIRECTORY
 
 # Header standard se servono per chiamate HTTP future
 HEADER = {

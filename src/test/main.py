@@ -62,7 +62,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         """
         print("\n--- STEP 1: Selezione Progetto Target ---")
 
-        # Progetto target
+        # Progetto target, CHANGE HERE TO CHANGE TARGET PROJECT
         project_key = "scacchi-usofuori"
 
         # Setup dello stato
