@@ -1,0 +1,25 @@
+[
+    {
+        "project": "spring-petclinic",
+        "timestamp": "2026-02-10 11:05:38",
+        "execution_time_seconds": 327.146142244339,
+        "total_files": 2,
+        "success_count": 2,
+        "failure_count": 0,
+        "total_attempts": 2,
+        "average_attempts": 1.0,
+        "final_coverage_percent": 91.9,
+        "details": [
+            {
+                "file": "src/main/java/org/springframework/samples/petclinic/owner/Owner.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/springframework/samples/petclinic/vet/Vets.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    }
+]

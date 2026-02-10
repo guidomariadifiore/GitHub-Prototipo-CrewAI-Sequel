@@ -427,8 +427,13 @@ class RefactoringFlow(Flow[RefactoringState]):
             self.state.final_coverage = 0.0
             return
         
+        # Costruzione path dinamico per l'agente JaCoCo (basato sull'esempio funzionante fornito)
+        user_home = os.path.expanduser("~").replace("\\", "/")
+        jacoco_agent_jar = f"{user_home}/.m2/repository/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar"
+        arg_line = f"-javaagent:{jacoco_agent_jar}=destfile=target/jacoco.exec -XX:+EnableDynamicAgentLoading"
+
         # Comando SENZA skipTests, ma con ignore failure per garantire che l'analisi Sonar venga eseguita
-        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
+        cmd_str = f'mvn clean verify org.jacoco:jacoco-maven-plugin:report org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -DargLine="{arg_line}"'
         
         print(f"Esecuzione test e analisi SonarQube su: {project_dir}")
         print("Questo passaggio potrebbe richiedere del tempo...")
