@@ -412,6 +412,21 @@ class RefactoringFlow(Flow[RefactoringState]):
 
         project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
         
+        # Optimization: Check if tests exist before running heavy build
+        test_dir = os.path.join(project_dir, "src", "test")
+        has_tests = False
+        if os.path.exists(test_dir):
+            for _, _, files in os.walk(test_dir):
+                if any(f.endswith(".java") for f in files):
+                    has_tests = True
+                    break
+
+        if not has_tests:
+            print(f"ℹ️ Nessun test (file .java) trovato in {self.state.project_key}.")
+            print("   Salto esecuzione test e imposto coverage a 0.0%.")
+            self.state.final_coverage = 0.0
+            return
+        
         # Comando SENZA skipTests, ma con ignore failure per garantire che l'analisi Sonar venga eseguita
         cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
         
