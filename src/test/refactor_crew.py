@@ -99,7 +99,7 @@ class SonarScanTool(BaseTool):
             return "Error: SONAR_TOKEN environment variable not set."
 
         # Command exactly as used in main.py
-        cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
+        cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -DskipTests" #RIAGGIUNGERE TEST
 
         try:
             # cwd=project_dir ensures we run in the correct folder
@@ -108,7 +108,7 @@ class SonarScanTool(BaseTool):
             )
 
             # Save full log to file for error summarizer
-            log_path = os.path.join(project_dir, "maven_build_log.txt")
+            log_path = os.path.abspath("maven_build_log.txt")
             with open(log_path, "w", encoding="utf-8") as f:
                 f.write(f"STDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}")
 
@@ -289,7 +289,7 @@ class RefactorCrew:
                 print("✅ File salvato correttamente via Python.")
             except Exception as e:
                 print(f"❌ Errore critico nel salvataggio manuale: {e}")
-                return False
+                return False, attempt + 1
 
             # FASE 2: Scansione e Verifica (Deterministica via Python)
             print(">>> Avvio scansione SonarQube (Deterministica)...")
@@ -300,7 +300,7 @@ class RefactorCrew:
             if not sonar_token:
                 result_str = "Error: SONAR_TOKEN environment variable not set."
             else:
-                cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
+                cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -DskipTests" #RIAGGIUNGERE TEST
 
                 try:
                     result = subprocess.run(
@@ -308,7 +308,7 @@ class RefactorCrew:
                     )
 
                     # Save full log to file for error summarizer
-                    log_path = os.path.join(project_dir, "maven_build_log.txt")
+                    log_path = os.path.abspath("maven_build_log.txt")
                     with open(log_path, "w", encoding="utf-8") as f:
                         f.write(f"STDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}")
 
@@ -334,7 +334,7 @@ class RefactorCrew:
             if build_failed:
                 failure_reason = "Build Failed"
                 # Retrieve full log from file
-                log_path = os.path.join(project_dir, "maven_build_log.txt")
+                log_path = os.path.abspath("maven_build_log.txt")
                 if os.path.exists(log_path):
                     with open(log_path, "r", encoding="utf-8") as f:
                         failure_details = f.read()
@@ -368,7 +368,7 @@ class RefactorCrew:
 
                 if not verification_error:
                     print(">>> Refactoring Verified! Issues resolved.")
-                    return result_str
+                    return result_str, attempt + 1
                 else:
                     failure_reason = "Verification Failed"
                     failure_details = verification_error
@@ -476,7 +476,7 @@ class RefactorCrew:
             except Exception as e:
                 print(f"Error restoring code: {e}")
 
-        return False
+        return False, max_retries
 
     def _wait_for_processing(self, project_key: str, sonar_token: str, sonar_url: str):
         """Waits for SonarQube Compute Engine to finish processing the submitted report."""

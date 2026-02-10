@@ -47,6 +47,11 @@ class RefactoringState(BaseModel):
     refactoring_valid: bool = False
     iteration: int = 0
     target_files: list = []
+    failure_count: int = 0
+    success_count: int = 0
+    total_attempts: int = 0
+    file_results: List[dict] = []
+    final_coverage: float = 0.0
 
 
 class RefactoringFlow(Flow[RefactoringState]):
@@ -64,7 +69,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         print("\n--- STEP 1: Selezione Progetto Target ---")
 
         # Progetto target, CHANGE HERE TO CHANGE TARGET PROJECT
-        project_key = "scacchi-usofuori"
+        project_key = "commons-compress"
 
         # Setup dello stato
         self.state.project_key = project_key
@@ -92,7 +97,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
         
         # Comando per la scansione iniziale
-        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
+        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -DskipTests" # RIAGGIUNGERE TEST
 
         try:
             print(f"Avvio scansione su: {project_dir}")
@@ -102,7 +107,7 @@ class RefactoringFlow(Flow[RefactoringState]):
 
             # Recupero hotspots con facets
             api_url = "http://localhost:9000/api/issues/search"
-            params = {"componentKeys": self.state.project_key, "facets": "files", "resolved": "false", "ps": 1}
+            params = {"componentKeys": self.state.project_key, "facets": "files", "resolved": "false", "ps": 1, "f.files.limit": 500}
             response = requests.get(api_url, auth=(sonar_token, ""), params=params)
             response.raise_for_status()
             data = response.json()
@@ -118,13 +123,53 @@ class RefactoringFlow(Flow[RefactoringState]):
             sorted_files = sorted(file_facet["values"], key=lambda x: x["count"], reverse=True)
             
             valid_files = []
+            print("🔎 Filtering files (checking ignore list and LOC <= 3500)...")
+
             for f in sorted_files:
+                if len(valid_files) >= 10:
+                    break
+
                 f_path = f["val"].split(":", 1)[-1]
-                if f_path not in ignored_files:
-                    valid_files.append(f)
+                # Extract path relative to project (handle project keys with colons correctly)
+                if f["val"].startswith(self.state.project_key + ":"):
+                    f_path = f["val"][len(self.state.project_key)+1:]
+                else:
+                    f_path = f["val"].split(":", 1)[-1]
+
+                if f_path in ignored_files:
+                    continue
+
+                # Check LOC via Sonar API
+                try:
+                    loc_url = "http://localhost:9000/api/measures/component"
+                    loc_params = {"component": f["val"], "metricKeys": "lines"}
+                    loc_resp = requests.get(loc_url, auth=(sonar_token, ""), params=loc_params)
+                    
+                    # Fallback if component key from facet gives 404 (mismatch in key format)
+                    if loc_resp.status_code == 404:
+                        fallback_key = f"{self.state.project_key}:{f_path}"
+                        if fallback_key != f["val"]:
+                            loc_params["component"] = fallback_key
+                            loc_resp = requests.get(loc_url, auth=(sonar_token, ""), params=loc_params)
+
+                    if loc_resp.status_code == 200:
+                        measures = loc_resp.json().get("component", {}).get("measures", [])
+                        # Default to a high number so we don't accidentally select files with missing metrics
+                        lines_val = next((int(m["value"]) for m in measures if m["metric"] == "lines"), 999999)
+                        
+                        if lines_val == 999999:
+                            print(f"⚠️ LOC metric missing for {f_path}. Skipping.")
+                        elif lines_val <= 3500:
+                            valid_files.append(f)
+                            print(f"✅ Added {f_path} (Issues: {f['count']}, LOC: {lines_val})")
+                        else:
+                            print(f"🚫 Skipping {f_path} (LOC: {lines_val} > 3500)")
+                    else:
+                        print(f"⚠️ Failed to get LOC for {f_path} (Key: {loc_params['component']}). Status: {loc_resp.status_code}. Skipping.")
+                except Exception as e:
+                    print(f"⚠️ Error checking LOC for {f_path}: {e}")
             
-            # Prendiamo i primi 10
-            self.state.target_files = valid_files[:10]
+            self.state.target_files = valid_files
             
             if not self.state.target_files:
                 print("✅ Nessun file idoneo trovato (tutti ignorati o nessun problema).")
@@ -307,12 +352,27 @@ class RefactoringFlow(Flow[RefactoringState]):
         }
 
         print("Avvio RefactorCrew con tutte le issue...")
-        result = RefactorCrew(llm=self.llm).run_refactoring_cycle(inputs=inputs)
+        result, attempts = RefactorCrew(llm=self.llm).run_refactoring_cycle(inputs=inputs)
+        
+        self.state.total_attempts += attempts
         
         if result is False:
+            self.state.failure_count += 1
+            self.state.file_results.append({
+                "file": self.state.file_path,
+                "status": "FAILED",
+                "attempts": attempts
+            })
             print(f"❌ Refactoring failed for {self.state.file_path}. Adding to ignore list.")
             add_to_ignore_list(self.state.file_path)
             return False
+        
+        self.state.success_count += 1
+        self.state.file_results.append({
+            "file": self.state.file_path,
+            "status": "SUCCESS",
+            "attempts": attempts
+        })
 
         print("--- Refactoring completato ---")
         
@@ -336,11 +396,104 @@ class RefactoringFlow(Flow[RefactoringState]):
             print(f"\n--- INIZIO CICLO PER: {self.state.file_path} ({next_file['count']} issues) ---")
             return "process_file"
         print("\n✅ Tutti i file in coda sono stati processati.")
-        return "completed"
+        return "final_coverage_scan"
+
+    @listen("final_coverage_scan")
+    def run_final_coverage_scan(self):
+        """
+        Step 6: Esegue scansione finale CON TEST per calcolare la coverage.
+        """
+        print("\n--- STEP 6: Scansione Finale con Test Coverage ---")
+        
+        sonar_token = os.getenv("SONAR_TOKEN")
+        if not sonar_token:
+            print("⚠️ SONAR_TOKEN mancante. Salto scansione coverage.")
+            return
+
+        project_dir = os.path.join(DIRECTORY_REPOS, self.state.project_key)
+        
+        # Comando SENZA skipTests, ma con ignore failure per garantire che l'analisi Sonar venga eseguita
+        cmd_str = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={self.state.project_key} -Dsonar.projectName={self.state.project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true"
+        
+        print(f"Esecuzione test e analisi SonarQube su: {project_dir}")
+        print("Questo passaggio potrebbe richiedere del tempo...")
+        
+        try:
+            subprocess.run(cmd_str, cwd=project_dir, check=True, capture_output=True, text=True, shell=True)
+            print("✅ Build e Test completati. Attesa elaborazione SonarQube...")
+            time.sleep(15) # Attesa buffer per elaborazione background
+            
+            # Recupero Coverage
+            api_url = "http://localhost:9000/api/measures/component"
+            params = {"component": self.state.project_key, "metricKeys": "coverage"}
+            
+            response = requests.get(api_url, auth=(sonar_token, ""), params=params)
+            if response.status_code == 200:
+                measures = response.json().get("component", {}).get("measures", [])
+                coverage_val = next((m["value"] for m in measures if m["metric"] == "coverage"), "0.0")
+                self.state.final_coverage = float(coverage_val)
+                print(f"✅ Final Test Coverage: {self.state.final_coverage}%")
+        except Exception as e:
+            print(f"❌ Errore durante la scansione finale/recupero coverage: {e}")
 
 def kickoff():
+    start_time = time.time()
     refactoring_flow = RefactoringFlow()
     refactoring_flow.kickoff()
+    end_time = time.time()
+
+    elapsed_time = end_time - start_time
+    hours = int(elapsed_time // 3600)
+    minutes = int((elapsed_time % 3600) // 60)
+
+    print(f"\nTotal execution time: {elapsed_time:.2f} seconds")
+    print(f"Total execution time: {hours} hours and {minutes} minutes")
+    
+    # Statistics Logging
+    state = refactoring_flow.state
+    total_files = len(state.file_results)
+    avg_attempts = state.total_attempts / total_files if total_files > 0 else 0
+
+    print("\n--- REFACTORING STATISTICS ---")
+    print(f"Total Files Processed: {total_files}")
+    print(f"Successful Refactorings: {state.success_count}")
+    print(f"Failed Refactorings: {state.failure_count}")
+    print(f"Total Attempts: {state.total_attempts}")
+    print(f"Average Attempts per File: {avg_attempts:.2f}")
+    print(f"Final Test Coverage: {state.final_coverage}%")
+
+    log_data = {
+        "project": state.project_key,
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "execution_time_seconds": elapsed_time,
+        "total_files": total_files,
+        "success_count": state.success_count,
+        "failure_count": state.failure_count,
+        "total_attempts": state.total_attempts,
+        "average_attempts": avg_attempts,
+        "final_coverage_percent": state.final_coverage,
+        "details": state.file_results
+    }
+    
+    stats_file = "refactoring_stats.json"
+    existing_data = []
+
+    if os.path.exists(stats_file):
+        try:
+            with open(stats_file, "r", encoding="utf-8") as f:
+                content = json.load(f)
+                if isinstance(content, list):
+                    existing_data = content
+                else:
+                    existing_data = [content]
+        except Exception:
+            pass
+
+    existing_data.append(log_data)
+    
+    with open(stats_file, "w", encoding="utf-8") as f:
+        json.dump(existing_data, f, indent=4)
+    print(f"Stats appended to {stats_file}")
 
 if __name__ == "__main__":
     kickoff()

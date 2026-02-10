@@ -1,0 +1,118 @@
+STDOUT:
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------< org.apache.commons:commons-compress >-----------------
+[INFO] Building Apache Commons Compress 1.29.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.5.0:clean (default-clean) @ commons-compress ---
+[INFO] Deleting G:\Thesis stuff\Projects\Apache\commons-compress\target
+[INFO] 
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-version) @ commons-compress ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO] 
+[INFO] --- enforcer:3.6.2:enforce (enforce-java-version) @ commons-compress ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] 
+[INFO] --- apache-rat:0.17:check (rat-check) @ commons-compress ---
+[WARNING] Basedir is : G:\Thesis stuff\Projects\Apache\commons-compress
+[INFO] Excluding patterns: src/test/resources/**, .pmd, .projectile, .mvn/**, .gitattributes, site-content/**, .checkstyle, .fbprefs, .pmd, .asf.yaml, .gitattributes, src/site/resources/download_*.cgi, maven-eclipse.xml, .externalToolBuilders/**, .vscode/**, .project, .classpath, .settings/**, **/*.svg, **/*.xcf
+[INFO] Excluding MAVEN collection.
+[INFO] Excluding ECLIPSE collection.
+[INFO] Excluding IDEA collection.
+[INFO] Processing exclude file from STANDARD_SCMS.
+[INFO] Excluding STANDARD_SCMS collection.
+[INFO] Excluding MISC collection.
+[INFO] Excluding HIDDEN_DIR collection.
+[INFO] RAT summary:
+[INFO] 
+  Approved:  699
+[INFO] 
+  Archives:  0
+[INFO] 
+  Binaries:  3
+[INFO] 
+  Document types:  4
+[INFO] 
+  Ignored:  10
+[INFO] 
+  License categories:  1
+[INFO] 
+  License names:  1
+[INFO] 
+  Notices:  4
+[INFO] 
+  Standards:  699
+[INFO] 
+  Unapproved:  0
+[INFO] 
+  Unknown:  0
+[INFO] 
+[INFO] --- artifact:3.6.1:check-buildplan (check-buildplan) @ commons-compress ---
+[INFO] No known issue in 21 plugins
+[INFO] 
+[INFO] --- build-helper:3.6.1:parse-version (parse-version) @ commons-compress ---
+[INFO] 
+[INFO] --- antrun:3.2.0:run (javadoc.resources) @ commons-compress ---
+[INFO] Executing tasks
+[INFO]      [copy] Copying 2 files to G:\Thesis stuff\Projects\Apache\commons-compress\target\apidocs\META-INF
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- remote-resources:3.3.0:process (process-resource-bundles) @ commons-compress ---
+[INFO] Skipping remote resources execution.
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ commons-compress ---
+[INFO] skip non existing resourceDirectory G:\Thesis stuff\Projects\Apache\commons-compress\src\main\resources
+[INFO] Copying 2 resources from . to target\classes\META-INF
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ commons-compress ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 416 source files with javac [debug release 8] to target\classes
+[INFO] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/archivers/ArchiveStreamFactory.java: Some input files use or override a deprecated API.
+[INFO] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/archivers/ArchiveStreamFactory.java: Recompile with -Xlint:deprecation for details.
+[INFO] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java: Some input files use unchecked or unsafe operations.
+[INFO] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java: Recompile with -Xlint:unchecked for details.
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] source value 8 is obsolete and will be removed in a future release
+[WARNING] target value 8 is obsolete and will be removed in a future release
+[WARNING] To suppress warnings about obsolete options, use -Xlint:-options.
+[INFO] 3 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[95,20] non-static variable this cannot be referenced from a static context
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[100,20] non-static variable this cannot be referenced from a static context
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[105,20] non-static variable this cannot be referenced from a static context
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[114,20] non-static variable this cannot be referenced from a static context
+[INFO] 4 errors 
+[INFO] -------------------------------------------------------------
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Skipping Apache Commons Compress
+[INFO] This project has been banned from the build due to previous failures.
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.740 s
+[INFO] Finished at: 2026-02-09T15:15:57+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project commons-compress: Compilation failure: Compilation failure: 
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[95,20] non-static variable this cannot be referenced from a static context
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[100,20] non-static variable this cannot be referenced from a static context
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[105,20] non-static variable this cannot be referenced from a static context
+[ERROR] /G:/Thesis stuff/Projects/Apache/commons-compress/src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java:[114,20] non-static variable this cannot be referenced from a static context
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+
+STDERR:

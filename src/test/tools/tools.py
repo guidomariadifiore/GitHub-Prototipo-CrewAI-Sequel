@@ -38,7 +38,8 @@ class SonarScanTool(BaseTool):
             f"-Dsonar.host.url={sonar_url} "
             f"-Dsonar.login={sonar_token} "
             f"-Dmaven.test.failure.ignore=true"
-        )
+            f"-DskipTests"
+            )
 
         try:
             # Eseguiamo il comando nella directory del progetto
