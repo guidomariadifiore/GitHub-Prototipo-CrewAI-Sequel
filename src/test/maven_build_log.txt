@@ -1,126 +1,48 @@
 STDOUT:
 [INFO] Scanning for projects...
 [INFO] 
-[INFO] ------------< org.springframework.samples:spring-petclinic >------------
-[INFO] Building petclinic 4.0.0-SNAPSHOT
+[INFO] ------------------< it.univaq.disim.oop:scacchi-mac >-------------------
+[INFO] Building scacchi-mac 0.0.1-SNAPSHOT
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
-[INFO] --- clean:3.5.0:clean (default-clean) @ spring-petclinic ---
-[INFO] Deleting G:\Thesis stuff\Projects\Apache\spring-petclinic\target
+[INFO] --- clean:3.2.0:clean (default-clean) @ scacchi-mac ---
+[INFO] Deleting G:\Thesis-stuff\Projects\Students\scacchi-mac\target
 [INFO] 
-[INFO] --- enforcer:3.6.2:enforce (enforce-java) @ spring-petclinic ---
-[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] --- resources:3.3.1:resources (default-resources) @ scacchi-mac ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory G:\Thesis-stuff\Projects\Students\scacchi-mac\src\main\resources
 [INFO] 
-[INFO] --- spring-javaformat:0.0.47:validate (default) @ spring-petclinic ---
-[INFO] 
-[INFO] --- checkstyle:3.6.0:check (nohttp-checkstyle-validation) @ spring-petclinic ---
-[INFO] You have 0 Checkstyle violations.
-[INFO] 
-[INFO] --- jacoco:0.8.14:prepare-agent (default) @ spring-petclinic ---
-[INFO] argLine set to "-javaagent:C:\\Users\\lampa\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=G:\\Thesis stuff\\Projects\\Apache\\spring-petclinic\\target\\jacoco.exec"
-[INFO] 
-[INFO] --- git-commit-id:9.0.2:revision (default) @ spring-petclinic ---
-[INFO] dotGitDirectory 'G:\Thesis stuff\Projects\Apache\spring-petclinic\.git'
-[INFO] Collected git.build.user.name with value guidomariadifiore
-[INFO] Collected git.build.user.email with value 129835652+guidomariadifiore@users.noreply.github.com
-[INFO] Collected git.branch with value main
-[INFO] Collected git.commit.id.describe with value a4fcf04-dirty
-[INFO] Collected git.commit.id.describe-short with value a4fcf04-dirty
-[INFO] Collected git.commit.id with value a4fcf04c932031463dc7eb1ed9f1e05b402c13c0
-[INFO] Collected git.commit.id.abbrev with value a4fcf04
-[INFO] Collected git.dirty with value true
-[INFO] Collected git.commit.user.name with value Dave Syer
-[INFO] Collected git.commit.user.email with value david.syer@broadcom.com
-[INFO] Collected git.commit.message.full with value Fix main method for docker compose
-[INFO] Collected git.commit.message.short with value Fix main method for docker compose
-[INFO] Collected git.commit.time with value 2026-02-07T12:17:59+01:00
-[INFO] Collected git.commit.author.time with value 2026-02-07T12:17:59+01:00
-[INFO] Collected git.commit.committer.time with value 2026-02-07T12:17:59+01:00
-[INFO] Collected git.remote.origin.url with value https://github.com/spring-projects/spring-petclinic
-[INFO] Collected git.tags with value 
-[INFO] Collected git.tag with value 
-[INFO] Collected git.closest.tag.name with value 
-[INFO] Collected git.closest.tag.commit.count with value 
-[INFO] Collected git.total.commit.count with value 1018
-[INFO] Collected git.local.branch.ahead with value 0
-[INFO] Collected git.local.branch.behind with value 0
-[INFO] Collected git.build.time with value 2024-11-28T15:37:52+01:00
-[INFO] Collected git.build.version with value 4.0.0-SNAPSHOT
-[INFO] Collected git.build.host with value Guido
-[INFO] including property 'git.tags' in results
-[INFO] including property 'git.build.version' in results
-[INFO] including property 'git.branch' in results
-[INFO] including property 'git.build.host' in results
-[INFO] including property 'git.commit.id' in results
-[INFO] including property 'git.commit.user.email' in results
-[INFO] including property 'git.local.branch.behind' in results
-[INFO] including property 'git.commit.author.time' in results
-[INFO] including property 'git.build.user.name' in results
-[INFO] including property 'git.dirty' in results
-[INFO] including property 'git.closest.tag.commit.count' in results
-[INFO] including property 'git.commit.user.name' in results
-[INFO] including property 'git.commit.id.abbrev' in results
-[INFO] including property 'git.commit.id.describe-short' in results
-[INFO] including property 'git.total.commit.count' in results
-[INFO] including property 'git.commit.id.describe' in results
-[INFO] including property 'git.build.user.email' in results
-[INFO] including property 'git.commit.message.short' in results
-[INFO] including property 'git.commit.committer.time' in results
-[INFO] including property 'git.tag' in results
-[INFO] including property 'git.closest.tag.name' in results
-[INFO] including property 'git.local.branch.ahead' in results
-[INFO] including property 'git.commit.time' in results
-[INFO] including property 'git.build.time' in results
-[INFO] including property 'git.commit.message.full' in results
-[INFO] including property 'git.remote.origin.url' in results
-[INFO] Writing properties file [G:\Thesis stuff\Projects\Apache\spring-petclinic\target\classes\git.properties] (for project petclinic)...
-[INFO] 
-[INFO] --- spring-boot:4.0.1:build-info (default) @ spring-petclinic ---
-[INFO] 
-[INFO] --- cyclonedx:2.9.1:makeAggregateBom (default) @ spring-petclinic ---
-[INFO] CycloneDX: Resolving Dependencies
-[INFO] CycloneDX: Creating BOM version 1.6 with 111 component(s)
-[INFO] CycloneDX: Writing and validating BOM (JSON): G:\Thesis stuff\Projects\Apache\spring-petclinic\target\classes\META-INF\sbom\application.cdx.json
-[WARNING] Unknown keyword meta:enum - you should define your own Meta Schema. If the keyword is irrelevant for validation, just use a NonValidationKeyword or if it should generate annotations AnnotationKeyword
-[WARNING] Unknown keyword deprecated - you should define your own Meta Schema. If the keyword is irrelevant for validation, just use a NonValidationKeyword or if it should generate annotations AnnotationKeyword
-[INFO]            attaching as spring-petclinic-4.0.0-SNAPSHOT-cyclonedx.json
-[INFO] 
-[INFO] --- resources:3.3.1:resources (default-resources) @ spring-petclinic ---
-[INFO] Copying 3 resources from src\main\resources to target\classes
-[INFO] Copying 45 resources from src\main\resources to target\classes
-[INFO] 
-[INFO] --- compiler:3.14.1:compile (default-compile) @ spring-petclinic ---
+[INFO] --- compiler:3.13.0:compile (default-compile) @ scacchi-mac ---
 [INFO] Recompiling the module because of changed source code.
-[INFO] Compiling 30 source files with javac [debug parameters release 17] to target\classes
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 37 source files with javac [debug target 1.8] to target\classes
+[WARNING] bootstrap class path is not set in conjunction with -source 8
+  not setting the bootstrap class path may lead to class files that cannot run on JDK 8
+    --release 8 is recommended instead of -source 8 -target 1.8 because it sets the bootstrap class path automatically
+[WARNING] source value 8 is obsolete and will be removed in a future release
+[WARNING] target value 8 is obsolete and will be removed in a future release
+[WARNING] To suppress warnings about obsolete options, use -Xlint:-options.
 [INFO] 
-[INFO] --- resources:3.3.1:testResources (default-testResources) @ spring-petclinic ---
-[INFO] skip non existing resourceDirectory G:\Thesis stuff\Projects\Apache\spring-petclinic\src\test\resources
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ scacchi-mac ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory G:\Thesis-stuff\Projects\Students\scacchi-mac\src\test\resources
 [INFO] 
-[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ spring-petclinic ---
-[INFO] Recompiling the module because of changed dependency.
-[INFO] Compiling 17 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ scacchi-mac ---
+[INFO] No sources to compile
 [INFO] 
-[INFO] --- surefire:3.5.4:test (default-test) @ spring-petclinic ---
-[WARNING]  Parameter 'systemProperties' is deprecated: Use systemPropertyVariables instead.
+[INFO] --- surefire:3.2.5:test (default-test) @ scacchi-mac ---
 [INFO] Tests are skipped.
 [INFO] 
-[INFO] --- jacoco:0.8.14:report (report) @ spring-petclinic ---
-[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] --- jar:3.4.1:jar (default-jar) @ scacchi-mac ---
+[INFO] Building jar: G:\Thesis-stuff\Projects\Students\scacchi-mac\target\scacchi-mac-0.0.1-SNAPSHOT.jar
 [INFO] 
-[INFO] --- jar:3.4.2:jar (default-jar) @ spring-petclinic ---
-[INFO] Building jar: G:\Thesis stuff\Projects\Apache\spring-petclinic\target\spring-petclinic-4.0.0-SNAPSHOT.jar
-[INFO] 
-[INFO] --- spring-boot:4.0.1:repackage (repackage) @ spring-petclinic ---
-[INFO] Replacing main artifact G:\Thesis stuff\Projects\Apache\spring-petclinic\target\spring-petclinic-4.0.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
-[INFO] The original artifact has been renamed to G:\Thesis stuff\Projects\Apache\spring-petclinic\target\spring-petclinic-4.0.0-SNAPSHOT.jar.original
-[INFO] 
-[INFO] ------------< org.springframework.samples:spring-petclinic >------------
-[INFO] Building petclinic 4.0.0-SNAPSHOT
+[INFO] ------------------< it.univaq.disim.oop:scacchi-mac >-------------------
+[INFO] Building scacchi-mac 0.0.1-SNAPSHOT
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
-[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ spring-petclinic ---
+[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ scacchi-mac ---
 [WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.
 [INFO] Java 25.0.2 Oracle Corporation (64-bit)
 [INFO] Windows 11 10.0 (amd64)
@@ -129,169 +51,161 @@ STDOUT:
 [INFO] Starting SonarScanner Engine...
 [INFO] Java 21.0.9 Eclipse Adoptium (64-bit)
 [INFO] Load global settings
-[INFO] Load global settings (done) | time=112ms
+[INFO] Load global settings (done) | time=97ms
 [INFO] Server id: 147B411E-AZtKqrz1-fAW5urr7IrP
 [WARNING] sonar.plugins.downloadOnlyRequired is false, so ALL available plugins will be downloaded
 [INFO] Loading all plugins
 [INFO] Load plugins index
 [INFO] Load plugins index (done) | time=16ms
 [INFO] Load/download plugins
-[INFO] Load/download plugins (done) | time=79ms
+[INFO] Load/download plugins (done) | time=77ms
 [INFO] Process project properties
-[INFO] Process project properties (done) | time=19ms
+[INFO] Process project properties (done) | time=16ms
 [INFO] Execute project builders
-[INFO] Execute project builders (done) | time=1ms
-[INFO] Project key: spring-petclinic
-[INFO] Base dir: G:\Thesis stuff\Projects\Apache\spring-petclinic
-[INFO] Working dir: G:\Thesis stuff\Projects\Apache\spring-petclinic\target\sonar
-[INFO] Load project settings for component key: 'spring-petclinic'
-[INFO] Load project settings for component key: 'spring-petclinic' (done) | time=15ms
+[INFO] Execute project builders (done) | time=0ms
+[INFO] Project key: scacchi-mac
+[INFO] Base dir: G:\Thesis-stuff\Projects\Students\scacchi-mac
+[INFO] Working dir: G:\Thesis-stuff\Projects\Students\scacchi-mac\target\sonar
+[INFO] Load project settings for component key: 'scacchi-mac'
+[INFO] Load project settings for component key: 'scacchi-mac' (done) | time=9ms
 [INFO] Load quality profiles
-[INFO] Load quality profiles (done) | time=71ms
+[INFO] Load quality profiles (done) | time=59ms
 [INFO] Load active rules
-[INFO] Load active rules (done) | time=339ms
+[INFO] Load active rules (done) | time=365ms
 [INFO] Load analysis cache
-[INFO] Load analysis cache (1.5 kB) | time=18ms
+[INFO] Load analysis cache (1.2 kB) | time=23ms
 [INFO] Preprocessing files...
-[INFO] 3 languages detected in 52 preprocessed files (done) | time=281ms
+[INFO] 2 languages detected in 39 preprocessed files (done) | time=339ms
 [INFO] 0 files ignored because of scm ignore settings
 [INFO] Load project repositories
-[INFO] Load project repositories (done) | time=132ms
+[INFO] Load project repositories (done) | time=96ms
 [INFO] Indexing files...
 [INFO] Project configuration:
-[INFO] 52 files indexed (done) | time=13ms
+[INFO] 39 files indexed (done) | time=13ms
 [INFO] Quality profile for java: GreenProfile
 [INFO] Quality profile for xml: Sonar way
-[INFO] Quality profile for yaml: Sonar way
-[INFO] ------------- Run sensors on module spring-petclinic
+[INFO] ------------- Run sensors on module scacchi-mac
 [INFO] Load metrics repository
-[INFO] Load metrics repository (done) | time=31ms
-[INFO] Reflections took 72 ms to scan 1 urls, producing 24 keys and 257 values
+[INFO] Load metrics repository (done) | time=20ms
+[INFO] Reflections took 82 ms to scan 1 urls, producing 24 keys and 257 values
 [INFO] Sensor JavaSensor [java]
-[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false
+[INFO] Configured Java source version (sonar.java.source): 8, preview features enabled (sonar.java.enablePreview): false
 [INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.
-[INFO] Using ECJ batch to parse 30 Main java source files with batch size 209 KB.
+[INFO] Using ECJ batch to parse 37 Main java source files with batch size 209 KB.
 [INFO] Starting batch processing.
 [INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.
 [INFO] 100% analyzed
 [INFO] Batch processing: Done.
-[INFO] Did not optimize analysis for any files, performed a full analysis for all 30 files.
-[INFO] Using ECJ batch to parse 17 Test java source files with batch size 209 KB.
-[INFO] Starting batch processing.
-[INFO] 100% analyzed
-[INFO] Batch processing: Done.
-[INFO] Did not optimize analysis for any files, performed a full analysis for all 17 files.
+[INFO] Did not optimize analysis for any files, performed a full analysis for all 37 files.
+[INFO] No "Test" source files to scan.
 [INFO] No "Generated" source files to scan.
-[INFO] Sensor JavaSensor [java] (done) | time=3147ms
+[INFO] Sensor JavaSensor [java] (done) | time=2206ms
 [INFO] Sensor Python Dependency Sensor [python]
-[INFO] Sensor Python Dependency Sensor [python] (done) | time=19ms
+[INFO] Sensor Python Dependency Sensor [python] (done) | time=20ms
 [INFO] Sensor JaCoCo XML Report Importer [jacoco]
 [INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml
 [INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer
-[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=3ms
-[INFO] Sensor IaC CloudFormation Sensor [iac]
-[INFO] There are no files to be analyzed for the CloudFormation language
-[INFO] Sensor IaC CloudFormation Sensor [iac] (done) | time=15ms
-[INFO] Sensor IaC cfn-lint report Sensor [iac]
-[INFO] Sensor IaC cfn-lint report Sensor [iac] (done) | time=5ms
-[INFO] Sensor IaC Kubernetes Sensor [iac]
-[INFO] There are no files to be analyzed for the Kubernetes language
-[INFO] Sensor IaC Kubernetes Sensor [iac] (done) | time=81ms
+[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=4ms
 [INFO] Sensor IaC hadolint report Sensor [iac]
-[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=1ms
+[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=0ms
 [INFO] Sensor Java Config Sensor [iac]
 [INFO] There are no files to be analyzed for the Java language
-[INFO] Sensor Java Config Sensor [iac] (done) | time=2ms
+[INFO] Sensor Java Config Sensor [iac] (done) | time=7ms
 [INFO] Sensor IaC Docker Sensor [iac]
 [INFO] There are no files to be analyzed for the Docker language
-[INFO] Sensor IaC Docker Sensor [iac] (done) | time=1ms
-[INFO] Sensor JavaScript inside YAML analysis [javascript]
-[INFO] No input files found for analysis
-[INFO] Hit the cache for 0 out of 0
-[INFO] Miss the cache for 0 out of 0
-[INFO] Sensor JavaScript inside YAML analysis [javascript] (done) | time=18ms
+[INFO] Sensor IaC Docker Sensor [iac] (done) | time=0ms
 [INFO] Sensor CSS Rules [javascript]
 [INFO] No CSS, PHP, HTML or VueJS files are found in the project. CSS analysis is skipped.
 [INFO] Sensor CSS Rules [javascript] (done) | time=0ms
 [INFO] Sensor C# Project Type Information [csharp]
-[INFO] Sensor C# Project Type Information [csharp] (done) | time=1ms
+[INFO] Sensor C# Project Type Information [csharp] (done) | time=0ms
 [INFO] Sensor C# Analysis Log [csharp]
-[INFO] Sensor C# Analysis Log [csharp] (done) | time=14ms
+[INFO] Sensor C# Analysis Log [csharp] (done) | time=16ms
 [INFO] Sensor C# Method Declarations [csharp]
-[INFO] Sensor C# Method Declarations [csharp] (done) | time=1ms
+[INFO] Sensor C# Method Declarations [csharp] (done) | time=0ms
 [INFO] Sensor C# Properties [csharp]
 [INFO] Sensor C# Properties [csharp] (done) | time=0ms
 [INFO] Sensor SurefireSensor [java]
-[INFO] parsing [G:\Thesis stuff\Projects\Apache\spring-petclinic\target\surefire-reports]
-[INFO] Sensor SurefireSensor [java] (done) | time=1ms
+[INFO] parsing [G:\Thesis-stuff\Projects\Students\scacchi-mac\target\surefire-reports]
+[INFO] Sensor SurefireSensor [java] (done) | time=0ms
 [INFO] Sensor HTML [web]
-[INFO] Sensor HTML [web] (done) | time=2ms
+[INFO] Sensor HTML [web] (done) | time=0ms
 [INFO] Sensor XML Sensor [xml]
 [INFO] 1 source file to be analyzed
 [INFO] 1/1 source file has been analyzed
-[INFO] Sensor XML Sensor [xml] (done) | time=235ms
+[INFO] Sensor XML Sensor [xml] (done) | time=142ms
 [INFO] Sensor VB.NET Project Type Information [vbnet]
-[INFO] Sensor VB.NET Project Type Information [vbnet] (done) | time=3ms
+[INFO] Sensor VB.NET Project Type Information [vbnet] (done) | time=15ms
 [INFO] Sensor VB.NET Analysis Log [vbnet]
-[INFO] Sensor VB.NET Analysis Log [vbnet] (done) | time=25ms
+[INFO] Sensor VB.NET Analysis Log [vbnet] (done) | time=9ms
 [INFO] Sensor VB.NET Method Declarations [vbnet]
-[INFO] Sensor VB.NET Method Declarations [vbnet] (done) | time=1ms
+[INFO] Sensor VB.NET Method Declarations [vbnet] (done) | time=0ms
 [INFO] Sensor VB.NET Properties [vbnet]
 [INFO] Sensor VB.NET Properties [vbnet] (done) | time=0ms
 [INFO] Sensor TextAndSecretsSensor [text]
 [INFO] Available processors: 20
 [INFO] Using 20 threads for analysis.
+[INFO] The property "sonar.tests" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:
+  * The filename starts with "test"
+  * The filename contains "test." or "tests."
+  * Any directory in the file path is named: "doc", "docs", "test" or "tests"
+  * Any directory in the file path has a name ending in "test" or "tests"
+
 [INFO] Start fetching files for the text and secrets analysis
 [INFO] Using Git CLI to retrieve untracked files
 [INFO] Retrieving language associated files and files included via "sonar.text.inclusions" that are tracked by git
 [INFO] Starting the text and secrets analysis
-[INFO] 52 source files to be analyzed for the text and secrets analysis
-[INFO] 52/52 source files have been analyzed for the text and secrets analysis
-[INFO] Sensor TextAndSecretsSensor [text] (done) | time=574ms
+[INFO] 38 source files to be analyzed for the text and secrets analysis
+[INFO] 38/38 source files have been analyzed for the text and secrets analysis
+[INFO] Sensor TextAndSecretsSensor [text] (done) | time=484ms
 [INFO] ------------- Run sensors on project
 [INFO] Sensor C# Telemetry processor [csharp]
-[INFO] Sensor C# Telemetry processor [csharp] (done) | time=4ms
+[INFO] Sensor C# Telemetry processor [csharp] (done) | time=5ms
 [INFO] Sensor C# Telemetry Json processor [csharp]
-[INFO] Sensor C# Telemetry Json processor [csharp] (done) | time=3ms
+[INFO] Sensor C# Telemetry Json processor [csharp] (done) | time=1ms
 [INFO] Sensor Analysis Warnings import [csharp]
 [INFO] Sensor Analysis Warnings import [csharp] (done) | time=2ms
 [INFO] Sensor VB.NET Telemetry processor [vbnet]
-[INFO] Sensor VB.NET Telemetry processor [vbnet] (done) | time=5ms
+[INFO] Sensor VB.NET Telemetry processor [vbnet] (done) | time=2ms
 [INFO] Sensor VB.NET Telemetry Json processor [vbnet]
-[INFO] Sensor VB.NET Telemetry Json processor [vbnet] (done) | time=2ms
+[INFO] Sensor VB.NET Telemetry Json processor [vbnet] (done) | time=9ms
 [INFO] Sensor Zero Coverage Sensor
-[INFO] Sensor Zero Coverage Sensor (done) | time=25ms
+[INFO] Sensor Zero Coverage Sensor (done) | time=29ms
 [INFO] Sensor Java CPD Block Indexer
-[INFO] Sensor Java CPD Block Indexer (done) | time=44ms
+[INFO] Sensor Java CPD Block Indexer (done) | time=90ms
 [INFO] Sensor JavaProjectSensor [java]
-[INFO] Sensor JavaProjectSensor [java] (done) | time=4ms
+[INFO] Sensor JavaProjectSensor [java] (done) | time=8ms
 [INFO] ------------- Gather SCA dependencies on project
 [INFO] Dependency analysis skipped
 [INFO] SCM Publisher SCM provider for this project is: git
-[INFO] SCM Publisher 3 source files to be analyzed
-[INFO] SCM Publisher 0/3 source files have been analyzed (done) | time=389ms
+[INFO] SCM Publisher 7 source files to be analyzed
+[INFO] SCM Publisher 0/7 source files have been analyzed (done) | time=630ms
 [WARNING] Missing blame information for the following files:
-[WARNING]   * src/main/java/org/springframework/samples/petclinic/vet/Vets.java
-[WARNING]   * src/main/java/org/springframework/samples/petclinic/owner/Owner.java
-[WARNING]   * pom.xml
+[WARNING]   * src/main/java/domain/Scacchiera.java
+[WARNING]   * src/main/java/logic/impl/TorreServiceImpl.java
+[WARNING]   * src/main/java/logic/Promozione.java
+[WARNING]   * src/main/java/logic/impl/PedoneServiceImpl.java
+[WARNING]   * src/main/java/logic/impl/ReginaServiceImpl.java
+[WARNING]   * src/main/java/logic/impl/AlfiereServiceImpl.java
+[WARNING]   * src/main/java/logic/Scacco.java
 [WARNING] This may lead to missing/broken features in SonarQube
-[INFO] CPD Executor 16 files had no CPD blocks
-[INFO] CPD Executor Calculating CPD for 14 files
-[INFO] CPD Executor CPD calculation finished (done) | time=10ms
-[INFO] SCM revision ID 'a4fcf04c932031463dc7eb1ed9f1e05b402c13c0'
-[INFO] Analysis report generated in 124ms, dir size=459.2 kB
-[INFO] Analysis report compressed in 860ms, zip size=161.6 kB
-[INFO] Analysis report uploaded in 75ms
-[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=spring-petclinic
+[INFO] CPD Executor 17 files had no CPD blocks
+[INFO] CPD Executor Calculating CPD for 20 files
+[INFO] CPD Executor CPD calculation finished (done) | time=37ms
+[INFO] SCM revision ID '4be20691ca5bb177f24aaf0f42943517bbfa7cd3'
+[INFO] Analysis report generated in 186ms, dir size=440.0 kB
+[INFO] Analysis report compressed in 632ms, zip size=132.9 kB
+[INFO] Analysis report uploaded in 64ms
+[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=scacchi-mac
 [INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
-[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=3caa0948-c110-4a26-971a-9b814458c74e
-[INFO] Analysis total time: 9.943 s
+[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=e9ab53cc-9a06-46ed-8f66-169d74505e7f
+[INFO] Analysis total time: 9.041 s
 [INFO] SonarScanner Engine completed successfully
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  27.985 s
-[INFO] Finished at: 2026-02-10T11:03:29+01:00
+[INFO] Total time:  16.133 s
+[INFO] Finished at: 2026-02-14T21:54:51+01:00
 [INFO] ------------------------------------------------------------------------
 
 

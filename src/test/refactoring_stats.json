@@ -8,7 +8,7 @@
         "failure_count": 0,
         "total_attempts": 2,
         "average_attempts": 1.0,
-        "final_coverage_percent": 91.9,
+        "final_coverage_percent": 84.2,
         "details": [
             {
                 "file": "src/main/java/org/springframework/samples/petclinic/owner/Owner.java",
@@ -17,6 +17,888 @@
             },
             {
                 "file": "src/main/java/org/springframework/samples/petclinic/vet/Vets.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "commons-compress",
+        "timestamp": "2026-02-10 15:01:08",
+        "execution_time_seconds": 4951.034254074097,
+        "total_files": 10,
+        "success_count": 7,
+        "failure_count": 3,
+        "total_attempts": 19,
+        "average_attempts": 1.9,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/compress/harmony/unpack200/ClassBands.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/harmony/pack200/ClassBands.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/compressors/bzip2/BZip2CompressorOutputStream.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/harmony/unpack200/BcBands.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/compressors/bzip2/BlockSort.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/harmony/unpack200/CpBands.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/harmony/pack200/CpBands.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/compressors/bzip2/BZip2CompressorInputStream.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/archivers/sevenz/SevenZOutputFile.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/compress/harmony/unpack200/NewAttributeBands.java",
+                "status": "FAILED",
+                "attempts": 4
+            }
+        ]
+    },
+    {
+        "project": "commons-lang",
+        "timestamp": "2026-02-11 13:08:28",
+        "execution_time_seconds": 8423.422828674316,
+        "total_files": 10,
+        "success_count": 4,
+        "failure_count": 6,
+        "total_attempts": 31,
+        "average_attempts": 3.1,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/lang3/builder/ToStringStyle.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/text/StrBuilder.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/Conversion.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/math/NumberUtils.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/ClassUtils.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/reflect/TypeUtils.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/text/ExtendedMessageFormat.java",
+                "status": "SUCCESS",
+                "attempts": 3
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/RandomStringUtils.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/reflect/MethodUtils.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/lang3/time/FastDatePrinter.java",
+                "status": "FAILED",
+                "attempts": 4
+            }
+        ]
+    },
+    {
+        "project": "commons-beanutils",
+        "timestamp": "2026-02-11 14:11:48",
+        "execution_time_seconds": 3302.0513446331024,
+        "total_files": 10,
+        "success_count": 8,
+        "failure_count": 2,
+        "total_attempts": 16,
+        "average_attempts": 1.6,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/LazyDynaBean.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/expression/DefaultResolver.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/LazyDynaList.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/PropertyUtilsBean.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/BasicDynaBean.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/BeanUtilsBean.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/ConvertUtils.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/BeanMap.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/converters/ArrayConverter.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/beanutils2/WrapDynaClass.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "commons-codec",
+        "timestamp": "2026-02-11 16:17:53",
+        "execution_time_seconds": 5839.44277381897,
+        "total_files": 10,
+        "success_count": 6,
+        "failure_count": 4,
+        "total_attempts": 22,
+        "average_attempts": 2.2,
+        "final_coverage_percent": 94.7,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/codec/binary/Base32.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/language/DoubleMetaphone.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/binary/Base64.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/language/Caverphone2.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/language/Caverphone1.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/digest/UnixCrypt.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/language/DaitchMokotoffSoundex.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/language/bm/Rule.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/binary/Base16.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/codec/language/MatchRatingApproachEncoder.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "commons-configuration",
+        "timestamp": "2026-02-12 13:31:21",
+        "execution_time_seconds": 6018.566402673721,
+        "total_files": 10,
+        "success_count": 0,
+        "failure_count": 10,
+        "total_attempts": 40,
+        "average_attempts": 4.0,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/XMLConfiguration.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/DataConfiguration.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/INIConfiguration.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/PropertiesConfigurationLayout.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/builder/combined/CombinedConfigurationBuilder.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/convert/DefaultListDelimiterHandler.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/AbstractConfiguration.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/beanutils/ConfigurationDynaClass.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/convert/LegacyListDelimiterHandler.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/configuration2/interpol/ConfigurationInterpolator.java",
+                "status": "FAILED",
+                "attempts": 4
+            }
+        ]
+    },
+    {
+        "project": "commons-dbcp",
+        "timestamp": "2026-02-12 20:36:47",
+        "execution_time_seconds": 2969.8373143672943,
+        "total_files": 10,
+        "success_count": 9,
+        "failure_count": 1,
+        "total_attempts": 15,
+        "average_attempts": 1.5,
+        "final_coverage_percent": 68.0,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/BasicDataSourceFactory.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/datasources/PerUserPoolDataSourceFactory.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/DelegatingConnection.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/cpdsadapter/PooledConnectionImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/datasources/InstanceKeyDataSourceFactory.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/datasources/PerUserPoolDataSource.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/managed/ManagedConnection.java",
+                "status": "SUCCESS",
+                "attempts": 3
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/AbandonedTrace.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/Utils.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbcp2/DelegatingPreparedStatement.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "commons-dbutils",
+        "timestamp": "2026-02-12 21:56:19",
+        "execution_time_seconds": 2177.306538581848,
+        "total_files": 10,
+        "success_count": 9,
+        "failure_count": 1,
+        "total_attempts": 15,
+        "average_attempts": 1.5,
+        "final_coverage_percent": 71.0,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/BeanProcessor.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/AbstractQueryRunner.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/BasicRowProcessor.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/GenerousBeanProcessor.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/QueryLoader.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/wrappers/SqlNullCheckedResultSet.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "pom.xml",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/BaseResultSetHandler.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/QueryRunner.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/dbutils/ResultSetIterator.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "commons-math",
+        "timestamp": "2026-02-13 13:44:05",
+        "execution_time_seconds": 10058.042965888977,
+        "total_files": 10,
+        "success_count": 0,
+        "failure_count": 10,
+        "total_attempts": 40,
+        "average_attempts": 4.0,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/optim/nonlinear/scalar/noderiv/BOBYQAOptimizer.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy-core/src/main/java/org/apache/commons/math4/legacy/core/dfp/Dfp.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/optim/nonlinear/scalar/noderiv/CMAESOptimizer.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/stat/regression/MillerUpdatingRegression.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-core/src/main/java/org/apache/commons/math4/core/jdkmath/AccurateMathCalc.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/linear/SingularValueDecomposition.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/optim/linear/SimplexTableau.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/linear/EigenDecomposition.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/linear/ArrayFieldVector.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "commons-math-legacy/src/main/java/org/apache/commons/math4/legacy/ml/clustering/FuzzyKMeansClusterer.java",
+                "status": "FAILED",
+                "attempts": 4
+            }
+        ]
+    },
+    {
+        "project": "commons-net",
+        "timestamp": "2026-02-13 21:04:48",
+        "execution_time_seconds": 3432.125202178955,
+        "total_files": 10,
+        "success_count": 9,
+        "failure_count": 1,
+        "total_attempts": 14,
+        "average_attempts": 1.4,
+        "final_coverage_percent": 37.4,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/net/examples/mail/IMAPExportMbox.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/nntp/NNTPClient.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/ftp/FTPClient.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/examples/mail/IMAPImportMbox.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/examples/mail/POP3ExportMbox.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/examples/ftp/FTPClientExample.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/ntp/TimeInfo.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/nntp/NewGroupsOrNewsQuery.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/nntp/Threader.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/net/smtp/SimpleSMTPHeader.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "commons-pool",
+        "timestamp": "2026-02-13 22:15:09",
+        "execution_time_seconds": 3497.9194140434265,
+        "total_files": 10,
+        "success_count": 8,
+        "failure_count": 2,
+        "total_attempts": 18,
+        "average_attempts": 1.8,
+        "final_coverage_percent": 87.9,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/pool3/impl/GenericKeyedObjectPool.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/impl/BaseGenericObjectPool.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/PoolUtils.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/impl/SoftReferenceObjectPool.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/impl/GenericObjectPool.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/impl/ResilientPooledObjectFactory.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/impl/LinkedBlockingDeque.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "pom.xml",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/impl/DefaultPooledObject.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/pool3/BaseObject.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "commons-text",
+        "timestamp": "2026-02-14 13:04:19",
+        "execution_time_seconds": 5198.470693588257,
+        "total_files": 10,
+        "success_count": 6,
+        "failure_count": 4,
+        "total_attempts": 28,
+        "average_attempts": 2.8,
+        "final_coverage_percent": 98.8,
+        "details": [
+            {
+                "file": "src/main/java/org/apache/commons/text/StrBuilder.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/TextStringBuilder.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/similarity/JaroWinklerSimilarity.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/ExtendedMessageFormat.java",
+                "status": "SUCCESS",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/WordUtils.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/similarity/LevenshteinDetailedDistance.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/translate/EntityArrays.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/AlphabetConverter.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/StringSubstitutor.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/org/apache/commons/text/similarity/LongestCommonSubsequence.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "scacchi-informatici-a-chiamata",
+        "timestamp": "2026-02-14 17:44:57",
+        "execution_time_seconds": 1672.3207895755768,
+        "total_files": 10,
+        "success_count": 9,
+        "failure_count": 1,
+        "total_attempts": 14,
+        "average_attempts": 1.4,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/ServiceImpl/PartitaServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/ServiceImpl/ScacchieraServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/lpo/Model/Regina.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/ServiceImpl/UtenteServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/lpo/Model/Alfiere.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/lpo/Model/Pedone.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/lpo/Model/Re.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/ServiceImpl/ComputerServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/lpo/Controller/Runner.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/lpo/Model/Torre.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "scacchi-iritardatari",
+        "timestamp": "2026-02-14 18:41:08",
+        "execution_time_seconds": 2095.5046367645264,
+        "total_files": 10,
+        "success_count": 3,
+        "failure_count": 7,
+        "total_attempts": 31,
+        "average_attempts": 3.1,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/engine/servizi/ScacchieraService.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/engine/servizi/Mossa.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/gui/CasellaScacchiera.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/pezzi/Regina.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/gui/ListaPartitaSalvateController.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/gui/ScacchieraController.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/engine/data/Logger.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/pezzi/Alfiere.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/pezzi/Pezzo.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/pezzi/Torre.java",
+                "status": "FAILED",
+                "attempts": 4
+            }
+        ]
+    },
+    {
+        "project": "scacchi-usofuori",
+        "timestamp": "2026-02-14 19:20:00",
+        "execution_time_seconds": 1377.64182472229,
+        "total_files": 10,
+        "success_count": 9,
+        "failure_count": 1,
+        "total_attempts": 14,
+        "average_attempts": 1.4,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/controller/ControllerScacchiera.java",
+                "status": "SUCCESS",
+                "attempts": 2
+            },
+            {
+                "file": "src/main/java/dataModel/MoveHistory.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/controller/ControllerLoadedGame.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/controller/LoadGameMenuController.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/dataModel/pieces/Alfiere.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/dataModel/pieces/Re.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/dataModel/pieces/Regina.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/dataModel/pieces/Torre.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/dataModel/pieces/Cavallo.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/dataModel/pieces/Pedone.java",
                 "status": "SUCCESS",
                 "attempts": 1
             }
