@@ -56,5 +56,7 @@
     "src/main/java/pezzi/Pezzo.java",
     "src/main/java/pezzi/Torre.java",
     "src/main/java/dataModel/MoveHistory.java",
-    "src/main/java/logic/impl/ComputerServiceImpl.java"
+    "src/main/java/logic/impl/ComputerServiceImpl.java",
+    "src/main/java/it/univaq/disim/oop/scacchi/scacchiera/Casella.java",
+    "src/main/java/it/univaq/disim/oop/scacchi/gui/PezziPresiPanel.java"
 ]

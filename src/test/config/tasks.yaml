@@ -34,38 +34,6 @@ task2: #refactoring
     The COMPLETE, FULLY EXPANDED refactored Java code. No comments like "rest of code".  agent: code_refactor
   agent: code_refactor
 
-task3: #code substitution
-  description: >
-    Overwrites the file at "{path_class}" with the complete refactored code from the previous task.
-    You MUST use the 'File Update Tool'.
-  expected_output: >
-    Confirmation that the file has been updated.
-  agent: code_replacer
-  tool: custom
-
-task4: #Scanning and validation
-  description: >
-    Run the sonar-scanner and Maven commands from the terminal on the newly modified file "{path_class}" in project "{project_key}".
-    IMPORTANT: You MUST use the 'Sonar Scan Tool' and pass the 'project_dir' argument ("{project_dir}") explicitly to it.
-    Must verify the compilation and capture any errors.
-  expected_output: >
-    The scan result (Build Success/Failure) according to Quality Gates, without showing the code
-  agent: sonar_agent
-  tool: custom
-
-conditional_task5: #rollback
-  description: >
-    Restores the original code in the file "{path_class}" if refactoring has introduced errors.
-    You MUST use the 'File Update Tool'.
-
-    ORIGINAL FILE CONTENT:
-    {code_class}
-
-    This is a safety mechanism (fallback).
-  expected_output: >
-    Confirmation that the original code has been restored.
-  agent: code_replacer
-
 conditional_task6: #error summarization
   description: >
     Analyze the build errors and the code context to understand why the refactoring failed.

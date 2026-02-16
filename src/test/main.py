@@ -69,7 +69,7 @@ class RefactoringFlow(Flow[RefactoringState]):
         print("\n--- STEP 1: Selezione Progetto Target ---")
 
         # Progetto target, CHANGE HERE TO CHANGE TARGET PROJECT
-        project_key = "scacchi-mac"
+        project_key = "scacchi-afp"
 
         # Setup dello stato
         self.state.project_key = project_key

@@ -903,5 +903,131 @@
                 "attempts": 1
             }
         ]
+    },
+    {
+        "project": "scacchi-mac",
+        "timestamp": "2026-02-14 22:00:13",
+        "execution_time_seconds": 1582.0343265533447,
+        "total_files": 10,
+        "success_count": 9,
+        "failure_count": 1,
+        "total_attempts": 16,
+        "average_attempts": 1.6,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/logic/impl/ReginaServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/logic/Scacco.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/domain/Scacchiera.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/logic/impl/AlfiereServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/logic/impl/PedoneServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/logic/Promozione.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/logic/impl/ComputerServiceImpl.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/logic/impl/TorreServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/logic/impl/MossaServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/logic/impl/ReServiceImpl.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
+    },
+    {
+        "project": "scacchi-afp",
+        "timestamp": "2026-02-15 10:57:50",
+        "execution_time_seconds": 1492.136605501175,
+        "total_files": 10,
+        "success_count": 8,
+        "failure_count": 2,
+        "total_attempts": 16,
+        "average_attempts": 1.6,
+        "final_coverage_percent": 0.0,
+        "details": [
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/scacchiera/Scacchiera.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/controller/ScacchieraController.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/cpu/Computer.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/gui/Tabella.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/scacchiera/Casella.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/gui/PezziPresiPanel.java",
+                "status": "FAILED",
+                "attempts": 4
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/gui/StoricoGiocoPanel.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/pezzi/Alfiere.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/pezzi/Cavallo.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            },
+            {
+                "file": "src/main/java/it/univaq/disim/oop/scacchi/pezzi/Pedone.java",
+                "status": "SUCCESS",
+                "attempts": 1
+            }
+        ]
     }
 ]

@@ -147,12 +147,6 @@ class RefactorCrew:
         )
 
     @agent
-    def code_replacer(self) -> Agent:
-        return Agent(
-            config=self.agents_config["code_replacer"], verbose=True, llm=self.llm
-        )
-
-    @agent
     def sonar_agent(self) -> Agent:
         return Agent(
             config=self.agents_config["sonar_agent"], verbose=True, llm=self.llm
@@ -177,29 +171,6 @@ class RefactorCrew:
         t.description += "\n\nIMPORTANT: Do NOT be lazy. You must output the full file content including all imports and unchanged methods. If you use placeholders like '// ...' the code will be broken."
         t.description += "\n\nCONTEXT FROM PREVIOUS ATTEMPT (If any):\n{previous_errors}"
         return t
-
-    @task
-    def task3(self) -> Task:
-        t = Task(
-            config=self.tasks_config["task3"], verbose=True, tools=[FileUpdateTool()]
-        )
-        # Force strict tool usage instruction
-        t.description += "\n\nCRITICAL: You MUST execute the 'Overwrite File Tool' to apply the changes. \n1. Pass the COMPLETE file content to the 'new_code' argument.\n2. Do NOT truncate the code. Do NOT use placeholders like '// ... rest of code'.\n3. Ensure the string is properly escaped if it contains quotes."
-        return t
-
-    @task
-    def task4(self) -> Task:
-        return Task(
-            config=self.tasks_config["task4"], verbose=True, tools=[SonarScanTool()]
-        )
-
-    @task
-    def conditional_task5(self) -> Task:
-        return Task(
-            config=self.tasks_config["conditional_task5"],
-            verbose=True,
-            tools=[FileUpdateTool()],
-        )
 
     @task
     def conditional_task6(self) -> Task:
@@ -250,7 +221,6 @@ class RefactorCrew:
             print(f"\n=== Refactoring Attempt {attempt + 1}/{max_retries} ===")
 
             # FASE 1: Generazione del Codice (Solo Task 1 e Task 2)
-            # Rimuoviamo code_replacer e sonar_agent da questa prima esecuzione
             generation_crew = Crew(
                 agents=[self.query_writer(), self.code_refactor()],
                 tasks=[self.task1(), self.task2()],  # Task 1: Prompt, Task 2: Code
@@ -282,7 +252,7 @@ class RefactorCrew:
                 f">>> Salvataggio manuale del file ({len(new_code_content)} caratteri)..."
             )
 
-            # SALVATAGGIO DETERMINISTICO (Sostituisce il Task 3 / code_replacer)
+            # SALVATAGGIO DETERMINISTICO
             try:
                 with open(file_path_full, "w", encoding="utf-8") as f:
                     f.write(new_code_content)
