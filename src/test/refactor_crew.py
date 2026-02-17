@@ -43,12 +43,6 @@ class RefactorCrew:
         )
 
     @agent
-    def sonar_agent(self) -> Agent:
-        return Agent(
-            config=self.agents_config["sonar_agent"], verbose=True, llm=self.llm
-        )
-
-    @agent
     def errors_summarizer(self) -> Agent:
         return Agent(
             config=self.agents_config["errors_summarizer"], verbose=True, llm=self.llm
