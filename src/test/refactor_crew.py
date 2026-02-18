@@ -160,7 +160,7 @@ class RefactorCrew:
             if not sonar_token:
                 result_str = "Error: SONAR_TOKEN environment variable not set."
             else:
-                cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -DskipTests" #RIAGGIUNGERE TEST
+                cmd = f"mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={project_key} -Dsonar.projectName={project_key} -Dsonar.host.url=http://localhost:9000 -Dsonar.token={sonar_token} -Dmaven.test.failure.ignore=true -DskipTests"
 
                 try:
                     result = subprocess.run(

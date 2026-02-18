@@ -1,5 +1,3 @@
-# TESTARE (avvia da 0 e vedi che succede)
-
 task1: #code analysis and prompting
   description: >
     Analyze the Java code provided below.
